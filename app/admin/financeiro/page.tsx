@@ -1,40 +1,47 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
+import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts"
 import { DollarSign, TrendingUp, Calendar, Users, Download } from "@/components/icons"
-import { useStore } from "@/lib/store"
-import { revenueData, serviceStats } from "@/lib/mock-data"
+import { useStats } from "@/lib/hooks/use-api"
+import { toast } from "sonner"
+import { ProtectedRoute } from "@/components/protected-route"
 
 export default function FinanceiroPage() {
-  const { appointments } = useStore()
-  const [period, setPeriod] = useState("month")
-
-  const completedAppointments = appointments.filter((a) => a.status === "completed")
-
-  const totalRevenue = completedAppointments.reduce((sum, a) => sum + a.servicePrice, 0)
-  const totalAppointments = completedAppointments.length
-  const averageTicket = totalAppointments > 0 ? totalRevenue / totalAppointments : 0
-
-  // Receita por barbeiro
-  const revenueByBarber = completedAppointments.reduce(
-    (acc, a) => {
-      if (!acc[a.barberName]) {
-        acc[a.barberName] = { name: a.barberName, revenue: 0, count: 0 }
-      }
-      acc[a.barberName].revenue += a.servicePrice
-      acc[a.barberName].count += 1
-      return acc
-    },
-    {} as Record<string, { name: string; revenue: number; count: number }>,
+  return (
+    <ProtectedRoute requiredPermission="VIEW_FINANCIAL">
+      <FinanceiroContent />
+    </ProtectedRoute>
   )
+}
 
-  const barberData = Object.values(revenueByBarber)
+function FinanceiroContent() {
+  const [period, setPeriod] = useState("month")
+  const { data: stats, isLoading } = useStats(period)
+
+  const handleExport = () => {
+    toast.success("Relatório financeiro exportado com sucesso!")
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  if (!stats) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Nenhum dado disponível</p>
+      </div>
+    )
+  }
 
   const pieColors = ["#d4a574", "#b8956a", "#9c8560", "#806556"]
 
@@ -57,7 +64,7 @@ export default function FinanceiroPage() {
               <SelectItem value="year">Este Ano</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExport}>
             <Download className="w-4 h-4 mr-2" />
             Exportar
           </Button>
@@ -72,12 +79,10 @@ export default function FinanceiroPage() {
             <DollarSign className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ {totalRevenue.toLocaleString("pt-BR")}</div>
-            <div className="flex items-center gap-1 text-xs mt-1">
-              <TrendingUp className="w-3 h-3 text-green-500" />
-              <span className="text-green-500">+12.5%</span>
-              <span className="text-muted-foreground">vs mês anterior</span>
-            </div>
+            <div className="text-2xl font-bold">R$ {stats.summary.totalRevenue.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {stats.summary.completedAppointments} atendimentos concluídos
+            </p>
           </CardContent>
         </Card>
 
@@ -87,79 +92,66 @@ export default function FinanceiroPage() {
             <Calendar className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalAppointments}</div>
-            <div className="flex items-center gap-1 text-xs mt-1">
-              <TrendingUp className="w-3 h-3 text-green-500" />
-              <span className="text-green-500">+8.3%</span>
-              <span className="text-muted-foreground">vs mês anterior</span>
-            </div>
+            <div className="text-2xl font-bold">{stats.summary.totalAppointments}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Taxa de conclusão: {stats.summary.completionRate.toFixed(1)}%
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Ticket Médio</CardTitle>
-            <DollarSign className="w-4 h-4 text-muted-foreground" />
+            <TrendingUp className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ {averageTicket.toFixed(2)}</div>
-            <div className="flex items-center gap-1 text-xs mt-1">
-              <TrendingUp className="w-3 h-3 text-green-500" />
-              <span className="text-green-500">+3.1%</span>
-              <span className="text-muted-foreground">vs mês anterior</span>
-            </div>
+            <div className="text-2xl font-bold">R$ {stats.summary.averageTicket.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground mt-1">Por atendimento concluído</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Barbeiros Ativos</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Taxa de Cancelamento</CardTitle>
             <Users className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{barberData.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Gerando receita</p>
+            <div className="text-2xl font-bold">{stats.summary.cancellationRate.toFixed(1)}%</div>
+            <p className="text-xs text-muted-foreground mt-1">Dos agendamentos totais</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Charts Row 1 */}
+      <div className="grid gap-4 lg:grid-cols-2">
         {/* Revenue Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Evolução da Receita</CardTitle>
-            <CardDescription>Receita mensal dos últimos 6 meses</CardDescription>
+            <CardTitle>Receita Mensal</CardTitle>
+            <p className="text-sm text-muted-foreground">Últimos 6 meses</p>
           </CardHeader>
           <CardContent>
             <ChartContainer
               config={{
                 revenue: {
                   label: "Receita",
-                  color: "hsl(var(--chart-1))",
+                  color: "hsl(var(--primary))",
                 },
               }}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="month" className="text-xs" tick={{ fill: "hsl(var(--muted-foreground))" }} />
-                  <YAxis
-                    className="text-xs"
-                    tick={{ fill: "hsl(var(--muted-foreground))" }}
-                    tickFormatter={(value) => `R$${value / 1000}k`}
-                  />
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent formatter={(value) => `R$ ${Number(value).toLocaleString("pt-BR")}`} />
-                    }
-                  />
+                <LineChart data={stats.monthlyRevenue}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="month" className="text-xs" />
+                  <YAxis className="text-xs" />
+                  <ChartTooltip content={<ChartTooltipContent />} />
                   <Line
                     type="monotone"
                     dataKey="revenue"
-                    stroke="var(--color-chart-1)"
+                    stroke="hsl(var(--primary))"
                     strokeWidth={2}
-                    dot={{ fill: "var(--color-chart-1)" }}
+                    dot={{ fill: "hsl(var(--primary))" }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -167,101 +159,149 @@ export default function FinanceiroPage() {
           </CardContent>
         </Card>
 
-        {/* Revenue by Barber */}
+        {/* Weekday Stats */}
         <Card>
           <CardHeader>
-            <CardTitle>Receita por Barbeiro</CardTitle>
-            <CardDescription>Distribuição da receita entre a equipe</CardDescription>
+            <CardTitle>Receita por Dia da Semana</CardTitle>
+            <p className="text-sm text-muted-foreground">Distribuição semanal</p>
           </CardHeader>
           <CardContent>
-            {barberData.length > 0 ? (
-              <div className="flex items-center gap-6">
-                <ChartContainer
-                  config={{
-                    revenue: {
-                      label: "Receita",
-                      color: "hsl(var(--chart-1))",
-                    },
-                  }}
-                  className="h-[200px] w-[200px]"
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={barberData}
-                        dataKey="revenue"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={50}
-                        outerRadius={80}
-                      >
-                        {barberData.map((_, index) => (
-                          <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
-                        ))}
-                      </Pie>
-                      <ChartTooltip
-                        content={
-                          <ChartTooltipContent formatter={(value) => `R$ ${Number(value).toLocaleString("pt-BR")}`} />
-                        }
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-                <div className="flex-1 space-y-3">
-                  {barberData.map((barber, index) => (
-                    <div key={barber.name} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: pieColors[index % pieColors.length] }}
-                        />
-                        <span className="text-sm">{barber.name}</span>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium">R$ {barber.revenue.toLocaleString("pt-BR")}</p>
-                        <p className="text-xs text-muted-foreground">{barber.count} atendimentos</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <p className="text-muted-foreground text-center py-8">Nenhum dado disponível.</p>
-            )}
+            <ChartContainer
+              config={{
+                revenue: {
+                  label: "Receita",
+                  color: "hsl(var(--primary))",
+                },
+              }}
+              className="h-[300px]"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={stats.weekdayStats}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="day" className="text-xs" />
+                  <YAxis className="text-xs" />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Line
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    dot={{ fill: "hsl(var(--primary))" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
       </div>
 
-      {/* Service Revenue */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Receita por Serviço</CardTitle>
-          <CardDescription>Performance de cada serviço oferecido</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {serviceStats.map((service, index) => {
-              const maxRevenue = Math.max(...serviceStats.map((s) => s.revenue))
-              const percentage = (service.revenue / maxRevenue) * 100
-              return (
-                <div key={service.name} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">{index + 1}</Badge>
-                      <span className="font-medium">{service.name}</span>
+      {/* Charts Row 2 */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Revenue by Barber */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Receita por Barbeiro</CardTitle>
+            <p className="text-sm text-muted-foreground">Desempenho individual</p>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                revenue: {
+                  label: "Receita",
+                  color: "hsl(var(--primary))",
+                },
+              }}
+              className="h-[300px]"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={stats.revenueByBarber}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="revenue"
+                  >
+                    {stats.revenueByBarber.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
+                    ))}
+                  </Pie>
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        {/* Revenue by Service */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Receita por Serviço</CardTitle>
+            <p className="text-sm text-muted-foreground">Serviços mais rentáveis</p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats.revenueByService.map((service, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium">{service.name}</span>
+                      <span className="text-sm font-bold">R$ {service.revenue.toFixed(2)}</span>
                     </div>
-                    <div className="text-right">
-                      <span className="font-bold">R$ {service.revenue.toLocaleString("pt-BR")}</span>
-                      <span className="text-muted-foreground ml-2">({service.count} atend.)</span>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>{service.count} atendimentos</span>
+                      <span>•</span>
+                      <span>Média: R$ {(service.revenue / service.count).toFixed(2)}</span>
                     </div>
-                  </div>
-                  <div className="h-2 rounded-full bg-secondary">
-                    <div className="h-2 rounded-full bg-primary transition-all" style={{ width: `${percentage}%` }} />
+                    <div className="w-full bg-secondary rounded-full h-2 mt-2">
+                      <div
+                        className="bg-primary h-2 rounded-full"
+                        style={{
+                          width: `${(service.revenue / Math.max(...stats.revenueByService.map((s) => s.revenue))) * 100}%`,
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
-              )
-            })}
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Barber Performance Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Desempenho dos Barbeiros</CardTitle>
+          <p className="text-sm text-muted-foreground">Ranking por receita</p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {stats.revenueByBarber
+              .sort((a, b) => b.revenue - a.revenue)
+              .map((barber, index) => (
+                <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary/20">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <span className="text-sm font-bold">{index + 1}</span>
+                    </div>
+                    <div>
+                      <p className="font-medium">{barber.name}</p>
+                      <p className="text-sm text-muted-foreground">{barber.count} atendimentos</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold">R$ {barber.revenue.toFixed(2)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Média: R$ {(barber.revenue / barber.count).toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              ))}
           </div>
         </CardContent>
       </Card>

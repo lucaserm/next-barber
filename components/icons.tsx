@@ -31,6 +31,10 @@ import {
   Bell,
   Home,
   FileText,
+  Shield,
+  User,
+  CheckCircle,
+  XCircle,
 } from "lucide-react"
 
 export {
@@ -66,4 +70,8 @@ export {
   Bell,
   Home,
   FileText,
+  Shield,
+  User,
+  CheckCircle,
+  XCircle,
 }

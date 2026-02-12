@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Scissors, Home, Calendar, Users, DollarSign, Settings, LogOut, Menu, X, FileText } from "@/components/icons"
-import { useStore } from "@/lib/store"
-import { useState } from "react"
+import { Scissors, Home, Calendar, Users, DollarSign, Settings, LogOut, Menu, X, FileText, Shield } from "@/components/icons"
+import { useLogout, useIsAdmin } from "@/lib/hooks/use-api"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
 const navItems = [
@@ -23,12 +23,19 @@ const navItems = [
 export function AdminSidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const { user, logout } = useStore()
+  const logout = useLogout()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    const userStr = localStorage.getItem("user")
+    if (userStr) {
+      setUser(JSON.parse(userStr))
+    }
+  }, [])
 
   const handleLogout = () => {
     logout()
-    router.push("/admin/login")
   }
 
   const SidebarContent = () => (
@@ -37,7 +44,7 @@ export function AdminSidebar() {
       <div className="p-4 border-b border-sidebar-border">
         <Link href="/admin" className="flex items-center gap-2">
           <Scissors className="w-6 h-6 text-sidebar-primary" />
-          <span className="font-serif text-xl font-bold text-sidebar-foreground">BarberPro</span>
+          <span className="font-serif text-xl font-bold text-sidebar-foreground">Elite67</span>
         </Link>
       </div>
 
@@ -62,6 +69,23 @@ export function AdminSidebar() {
             </Link>
           )
         })}
+        
+        {/* Permissões (apenas para admin) */}
+        {user?.role === "admin" && (
+          <Link
+            href="/admin/permissoes"
+            onClick={() => setMobileOpen(false)}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              pathname === "/admin/permissoes"
+                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+            )}
+          >
+            <Shield className="w-5 h-5" />
+            Permissões
+          </Link>
+        )}
       </nav>
 
       {/* User */}
@@ -100,7 +124,7 @@ export function AdminSidebar() {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-sidebar border-b border-sidebar-border flex items-center justify-between px-4">
         <Link href="/admin" className="flex items-center gap-2">
           <Scissors className="w-5 h-5 text-sidebar-primary" />
-          <span className="font-serif text-lg font-bold text-sidebar-foreground">BarberPro</span>
+          <span className="font-serif text-lg font-bold text-sidebar-foreground">Elite67</span>
         </Link>
         <Button
           variant="ghost"

@@ -29,18 +29,22 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Edit, Trash2, Phone, Mail, Search, UserPlus, Calendar, DollarSign } from "@/components/icons"
-import { useStore } from "@/lib/store"
+import { useClients, useCreateClient, useUpdateClient, useDeleteClient, useAppointments } from "@/lib/hooks/use-api"
 import { toast } from "sonner"
-import type { Client } from "@/lib/types"
+import { ProtectedRoute } from "@/components/protected-route"
 
 function ClientesContent() {
-  const { clients, appointments, addClient, updateClient, deleteClient } = useStore()
+  const { data: clients = [], isLoading } = useClients()
+  const { data: appointments = [] } = useAppointments({})
+  const createClient = useCreateClient()
+  const updateClient = useUpdateClient()
+  const deleteClient = useDeleteClient()
 
   const [searchTerm, setSearchTerm] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
-  const [viewingClient, setViewingClient] = useState<Client | null>(null)
-  const [editingClient, setEditingClient] = useState<Client | null>(null)
+  const [viewingClient, setViewingClient] = useState<any | null>(null)
+  const [editingClient, setEditingClient] = useState<any | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -78,26 +82,55 @@ function ClientesContent() {
     e.preventDefault()
 
     if (editingClient) {
-      updateClient(editingClient.id, formData)
-      toast.success("Cliente atualizado com sucesso!")
+      updateClient.mutate(
+        { id: editingClient.id, data: formData },
+        {
+          onSuccess: () => {
+            toast.success("Cliente atualizado com sucesso!")
+            setIsDialogOpen(false)
+          },
+          onError: (error) => {
+            toast.error(`Erro: ${error.message}`)
+          },
+        }
+      )
     } else {
-      addClient(formData)
-      toast.success("Cliente cadastrado com sucesso!")
+      createClient.mutate(formData, {
+        onSuccess: () => {
+          toast.success("Cliente cadastrado com sucesso!")
+          setIsDialogOpen(false)
+        },
+        onError: (error) => {
+          toast.error(`Erro: ${error.message}`)
+        },
+      })
     }
-
-    setIsDialogOpen(false)
   }
 
   const handleDelete = () => {
     if (deleteId) {
-      deleteClient(deleteId)
-      toast.success("Cliente removido com sucesso!")
-      setDeleteId(null)
+      deleteClient.mutate(deleteId, {
+        onSuccess: () => {
+          toast.success("Cliente removido com sucesso!")
+          setDeleteId(null)
+        },
+        onError: (error) => {
+          toast.error(`Erro: ${error.message}`)
+        },
+      })
     }
   }
 
   const getClientAppointments = (clientId: string) => {
-    return appointments.filter((a) => a.clientId === clientId || a.clientName === viewingClient?.name)
+    return appointments.filter((a: any) => a.clientId === clientId || a.clientName === viewingClient?.name)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   return (
@@ -403,8 +436,10 @@ function ClientesContent() {
 
 export default function ClientesPage() {
   return (
-    <Suspense fallback={null}>
-      <ClientesContent />
-    </Suspense>
+    <ProtectedRoute requiredPermission="MANAGE_CLIENTS">
+      <Suspense fallback={null}>
+        <ClientesContent />
+      </Suspense>
+    </ProtectedRoute>
   )
 }

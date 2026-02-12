@@ -1,0 +1,125 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(BARBER)
+  barberId  String?  @unique
+  barber    Barber?  @relation(fields: [barberId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Service {
+  id           String        @id @default(uuid())
+  name         String        @unique
+  description  String
+  price        Float
+  duration     Int
+  active       Boolean       @default(true)
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("services")
+}
+
+model Barber {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  phone        String
+  avatar       String?
+  specialties  String[]
+  active       Boolean       @default(true)
+  user         User?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+  permissions  Permission[]
+
+  @@map("barbers")
+}
+
+model Client {
+  id           String        @id @default(uuid())
+  name         String
+  email        String
+  phone        String        @unique
+  birthDate    String?
+  notes        String?
+  totalVisits  Int           @default(0)
+  totalSpent   Float         @default(0)
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("clients")
+}
+
+model Appointment {
+  id          String            @id @default(uuid())
+  clientId    String?
+  client      Client?           @relation(fields: [clientId], references: [id])
+  clientName  String
+  clientPhone String
+  barberId    String
+  barber      Barber            @relation(fields: [barberId], references: [id])
+  serviceId   String
+  service     Service           @relation(fields: [serviceId], references: [id])
+  date        String
+  time        String
+  status      AppointmentStatus @default(PENDING)
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@map("appointments")
+}
+
+model Permission {
+  id         String         @id @default(uuid())
+  barberId   String
+  barber     Barber         @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  permission PermissionType
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@unique([barberId, permission])
+  @@map("permissions")
+}
+
+enum Role {
+  ADMIN
+  BARBER
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum PermissionType {
+  VIEW_DASHBOARD
+  MANAGE_APPOINTMENTS
+  MANAGE_CLIENTS
+  MANAGE_SERVICES
+  VIEW_FINANCIAL
+  VIEW_REPORTS
+  MANAGE_BARBERS
+  MANAGE_PERMISSIONS
+}

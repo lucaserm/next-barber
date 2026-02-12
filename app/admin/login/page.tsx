@@ -10,30 +10,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Scissors, AlertCircle } from "@/components/icons"
-import { useStore } from "@/lib/store"
+import { useLogin } from "@/lib/hooks/use-api"
+import { toast } from "sonner"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login } = useStore()
+  const login = useLogin()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
-    setIsLoading(true)
 
-    const success = await login(email, password)
-
-    if (success) {
-      router.push("/admin")
-    } else {
-      setError("E-mail ou senha inválidos")
-    }
-
-    setIsLoading(false)
+    login.mutate(
+      { email, password },
+      {
+        onSuccess: (data) => {
+          toast.success(`Bem-vindo, ${data.user.name}!`)
+          router.push("/admin")
+        },
+        onError: (error) => {
+          toast.error(error.message || "E-mail ou senha inválidos")
+        },
+      },
+    )
   }
 
   return (
@@ -42,17 +42,17 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <Link href="/" className="flex items-center justify-center gap-2 mb-4">
             <Scissors className="w-8 h-8 text-primary" />
-            <span className="font-serif text-2xl font-bold">BarberPro</span>
+            <span className="font-serif text-2xl font-bold">Elite67</span>
           </Link>
           <CardTitle>Área Administrativa</CardTitle>
           <CardDescription>Entre com suas credenciais para acessar o painel</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
+            {login.isError && (
               <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
                 <AlertCircle className="w-4 h-4" />
-                {error}
+                {login.error?.message || "E-mail ou senha inválidos"}
               </div>
             )}
 
@@ -65,6 +65,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={login.isPending}
               />
             </div>
 
@@ -77,11 +78,12 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={login.isPending}
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Entrando..." : "Entrar"}
+            <Button type="submit" className="w-full" disabled={login.isPending}>
+              {login.isPending ? "Entrando..." : "Entrar"}
             </Button>
           </form>
 
@@ -90,7 +92,7 @@ export default function LoginPage() {
             <p className="text-muted-foreground">
               Admin: admin@barberpro.com / admin123
               <br />
-              Barbeiro: carlos@barberpro.com / barber123
+              Barbeiro: joao@barberpro.com / barber123
             </p>
           </div>
         </CardContent>

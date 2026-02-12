@@ -28,12 +28,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Plus, Edit, Trash2, Clock, DollarSign, Search } from "@/components/icons"
-import { useStore } from "@/lib/store"
+import { useServices, useCreateService, useUpdateService, useDeleteService } from "@/lib/hooks/use-api"
 import { toast } from "sonner"
+import { ProtectedRoute } from "@/components/protected-route"
 import type { Service } from "@/lib/types"
 
 function ServicosContent() {
-  const { services, addService, updateService, deleteService } = useStore()
+  const { data: services = [], isLoading } = useServices()
+  const createService = useCreateService()
+  const updateService = useUpdateService()
+  const deleteService = useDeleteService()
 
   const [searchTerm, setSearchTerm] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -48,7 +52,7 @@ function ServicosContent() {
   })
 
   const filteredServices = services.filter(
-    (s) =>
+    (s: any) =>
       s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.description.toLowerCase().includes(searchTerm.toLowerCase()),
   )
@@ -83,27 +87,62 @@ function ServicosContent() {
     }
 
     if (editingService) {
-      updateService(editingService.id, serviceData)
-      toast.success("Serviço atualizado com sucesso!")
+      updateService.mutate(
+        { id: editingService.id, data: serviceData },
+        {
+          onSuccess: () => {
+            toast.success("Serviço atualizado com sucesso!")
+            setIsDialogOpen(false)
+          },
+          onError: (error) => {
+            toast.error(`Erro: ${error.message}`)
+          },
+        },
+      )
     } else {
-      addService(serviceData)
-      toast.success("Serviço criado com sucesso!")
+      createService.mutate(serviceData, {
+        onSuccess: () => {
+          toast.success("Serviço criado com sucesso!")
+          setIsDialogOpen(false)
+        },
+        onError: (error) => {
+          toast.error(`Erro: ${error.message}`)
+        },
+      })
     }
-
-    setIsDialogOpen(false)
   }
 
   const handleDelete = () => {
     if (deleteId) {
-      deleteService(deleteId)
-      toast.success("Serviço removido com sucesso!")
-      setDeleteId(null)
+      deleteService.mutate(deleteId, {
+        onSuccess: () => {
+          toast.success("Serviço removido com sucesso!")
+          setDeleteId(null)
+        },
+        onError: (error) => {
+          toast.error(`Erro: ${error.message}`)
+        },
+      })
     }
   }
 
-  const toggleActive = (service: Service) => {
-    updateService(service.id, { active: !service.active })
-    toast.success(service.active ? "Serviço desativado" : "Serviço ativado")
+  const toggleActive = (service: any) => {
+    updateService.mutate(
+      { id: service.id, data: { active: !service.active } },
+      {
+        onSuccess: () => {
+          toast.success(service.active ? "Serviço desativado" : "Serviço ativado")
+        },
+      },
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   return (
@@ -130,7 +169,7 @@ function ServicosContent() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredServices.map((service) => (
+        {filteredServices.map((service: any) => (
           <Card key={service.id} className={!service.active ? "opacity-60" : ""}>
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
@@ -163,7 +202,12 @@ function ServicosContent() {
                   <Edit className="w-4 h-4 mr-1" />
                   Editar
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => toggleActive(service)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => toggleActive(service)}
+                  disabled={updateService.isPending}
+                >
                   {service.active ? "Desativar" : "Ativar"}
                 </Button>
                 <Button
@@ -261,7 +305,13 @@ function ServicosContent() {
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancelar
               </Button>
-              <Button type="submit">{editingService ? "Salvar" : "Criar"}</Button>
+              <Button type="submit" disabled={createService.isPending || updateService.isPending}>
+                {createService.isPending || updateService.isPending
+                  ? "Salvando..."
+                  : editingService
+                    ? "Salvar"
+                    : "Criar"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -277,8 +327,12 @@ function ServicosContent() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Excluir
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground"
+              disabled={deleteService.isPending}
+            >
+              {deleteService.isPending ? "Excluindo..." : "Excluir"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -289,8 +343,10 @@ function ServicosContent() {
 
 export default function ServicosPage() {
   return (
-    <Suspense fallback={null}>
-      <ServicosContent />
-    </Suspense>
+    <ProtectedRoute requiredPermission="MANAGE_SERVICES">
+      <Suspense fallback={null}>
+        <ServicosContent />
+      </Suspense>
+    </ProtectedRoute>
   )
 }

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Login Cookie</title>
+</head>
+<body>
+    <h1>Teste de Login com Cookie</h1>
+    
+    <form id="loginForm">
+        <div>
+            <label>Email:</label>
+            <input type="email" id="email" value="admin@barberpro.com">
+        </div>
+        <div>
+            <label>Senha:</label>
+            <input type="password" id="password" value="admin123">
+        </div>
+        <button type="submit">Login</button>
+    </form>
+    
+    <div id="result"></div>
+    <div id="cookies"></div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+            const cookiesDiv = document.getElementById('cookies');
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Salvar no localStorage
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Salvar no cookie
+                    document.cookie = `token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`;
+                    
+                    resultDiv.innerHTML = '<p style="color: green;">Login bem-sucedido!</p>';
+                    resultDiv.innerHTML += '<p>Token: ' + data.token.substring(0, 50) + '...</p>';
+                    resultDiv.innerHTML += '<p>User: ' + JSON.stringify(data.user, null, 2) + '</p>';
+                    
+                    // Mostrar cookies
+                    cookiesDiv.innerHTML = '<h3>Cookies:</h3><pre>' + document.cookie + '</pre>';
+                    
+                    // Redirecionar após 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/admin';
+                    }, 2000);
+                } else {
+                    resultDiv.innerHTML = '<p style="color: red;">Erro: ' + data.error + '</p>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<p style="color: red;">Erro: ' + error.message + '</p>';
+            }
+        });
+        
+        // Mostrar cookies atuais
+        document.getElementById('cookies').innerHTML = '<h3>Cookies Atuais:</h3><pre>' + document.cookie + '</pre>';
+    </script>
+</body>
+</html>

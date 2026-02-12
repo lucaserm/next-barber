@@ -22,7 +22,7 @@ export function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <Scissors className="w-6 h-6 text-primary" />
-            <span className="font-serif text-xl font-bold">BarberPro</span>
+            <span className="font-serif text-xl font-bold">Elite67</span>
           </Link>
 
           {/* Desktop Nav */}

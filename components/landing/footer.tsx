@@ -8,11 +8,11 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <Link href="/" className="flex items-center gap-2">
             <Scissors className="w-5 h-5 text-primary" />
-            <span className="font-serif text-lg font-bold">BarberPro</span>
+            <span className="font-serif text-lg font-bold">Elite67</span>
           </Link>
 
           <p className="text-sm text-muted-foreground text-center">
-            © {new Date().getFullYear()} BarberPro. Todos os direitos reservados.
+            © {new Date().getFullYear()} Elite67. Todos os direitos reservados.
           </p>
 
           <div className="flex items-center gap-6">

@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Clock, Check, X } from "@/components/icons"
-import { useStore } from "@/lib/store"
+import { useAppointments, useUpdateAppointment } from "@/lib/hooks/use-api"
+import { toast } from "sonner"
+import { format } from "date-fns"
 
 const statusColors = {
   pending: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
@@ -22,21 +24,55 @@ const statusLabels = {
 }
 
 export function TodayAppointments() {
-  const { appointments, updateAppointment } = useStore()
+  const today = format(new Date(), "yyyy-MM-dd")
+  const { data: appointments = [], isLoading } = useAppointments({ date: today })
+  const updateAppointment = useUpdateAppointment()
 
-  const today = new Date().toISOString().split("T")[0]
-  const todayAppointments = appointments.filter((a) => a.date === today).sort((a, b) => a.time.localeCompare(b.time))
+  const todayAppointments = appointments.sort((a: any, b: any) => a.time.localeCompare(b.time))
 
   const handleConfirm = (id: string) => {
-    updateAppointment(id, { status: "confirmed" })
+    updateAppointment.mutate(
+      { id, data: { status: "confirmed" } },
+      {
+        onSuccess: () => toast.success("Agendamento confirmado!"),
+        onError: (error) => toast.error(`Erro: ${error.message}`),
+      }
+    )
   }
 
   const handleCancel = (id: string) => {
-    updateAppointment(id, { status: "cancelled" })
+    updateAppointment.mutate(
+      { id, data: { status: "cancelled" } },
+      {
+        onSuccess: () => toast.success("Agendamento cancelado!"),
+        onError: (error) => toast.error(`Erro: ${error.message}`),
+      }
+    )
   }
 
   const handleComplete = (id: string) => {
-    updateAppointment(id, { status: "completed" })
+    updateAppointment.mutate(
+      { id, data: { status: "completed" } },
+      {
+        onSuccess: () => toast.success("Agendamento finalizado!"),
+        onError: (error) => toast.error(`Erro: ${error.message}`),
+      }
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Agendamentos de Hoje</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -52,7 +88,7 @@ export function TodayAppointments() {
           <p className="text-sm text-muted-foreground text-center py-8">Nenhum agendamento para hoje.</p>
         ) : (
           <div className="space-y-4">
-            {todayAppointments.map((appointment) => (
+            {todayAppointments.map((appointment: any) => (
               <div
                 key={appointment.id}
                 className="flex items-center gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -66,7 +102,7 @@ export function TodayAppointments() {
                   <AvatarFallback className="text-xs">
                     {appointment.clientName
                       .split(" ")
-                      .map((n) => n[0])
+                      .map((n: string) => n[0])
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
@@ -74,12 +110,12 @@ export function TodayAppointments() {
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{appointment.clientName}</p>
                   <p className="text-sm text-muted-foreground truncate">
-                    {appointment.serviceName} • {appointment.barberName}
+                    {appointment.service?.name} • {appointment.barber?.name}
                   </p>
                 </div>
 
-                <Badge variant="outline" className={statusColors[appointment.status]}>
-                  {statusLabels[appointment.status]}
+                <Badge variant="outline" className={statusColors[appointment.status as keyof typeof statusColors]}>
+                  {statusLabels[appointment.status as keyof typeof statusLabels]}
                 </Badge>
 
                 {appointment.status === "pending" && (

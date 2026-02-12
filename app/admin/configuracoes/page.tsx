@@ -1,17 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -19,27 +25,42 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Settings, Users, Bell, Clock, Plus, Edit, Trash2 } from "@/components/icons"
-import { useStore } from "@/lib/store"
-import { toast } from "sonner"
-import type { Barber } from "@/lib/types"
+} from "@/components/ui/dialog";
+import {
+  Settings,
+  Users,
+  Bell,
+  Clock,
+  Plus,
+  Edit,
+  Trash2,
+} from "@/components/icons";
+import {
+  useBarbers,
+  useCreateBarber,
+  useUpdateBarber,
+  useDeleteBarber,
+} from "@/lib/hooks/use-api";
+import { toast } from "sonner";
 
 export default function ConfiguracoesPage() {
-  const { barbers, addBarber, updateBarber, deleteBarber } = useStore()
+  const { data: barbers = [], isLoading } = useBarbers();
+  const createBarber = useCreateBarber();
+  const updateBarber = useUpdateBarber();
+  const deleteBarber = useDeleteBarber();
 
-  const [isBarberDialogOpen, setIsBarberDialogOpen] = useState(false)
-  const [editingBarber, setEditingBarber] = useState<Barber | null>(null)
+  const [isBarberDialogOpen, setIsBarberDialogOpen] = useState(false);
+  const [editingBarber, setEditingBarber] = useState<any | null>(null);
   const [barberForm, setBarberForm] = useState({
     name: "",
     email: "",
     phone: "",
     specialties: "",
     active: true,
-  })
+  });
 
   const [businessSettings, setBusinessSettings] = useState({
-    name: "BarberPro",
+    name: "Elite67",
     address: "Rua dos Barbeiros, 123 - Centro, São Paulo/SP",
     phone: "(11) 99999-9999",
     email: "contato@barberpro.com",
@@ -47,7 +68,7 @@ export default function ConfiguracoesPage() {
     closeTime: "20:00",
     saturdayClose: "18:00",
     workSunday: false,
-  })
+  });
 
   const [notificationSettings, setNotificationSettings] = useState({
     emailConfirmation: true,
@@ -55,27 +76,33 @@ export default function ConfiguracoesPage() {
     reminderHours: "2",
     newAppointmentAlert: true,
     dailySummary: true,
-  })
+  });
 
-  const openBarberDialog = (barber?: Barber) => {
+  const openBarberDialog = (barber?: any) => {
     if (barber) {
-      setEditingBarber(barber)
+      setEditingBarber(barber);
       setBarberForm({
         name: barber.name,
         email: barber.email,
         phone: barber.phone,
         specialties: barber.specialties.join(", "),
         active: barber.active,
-      })
+      });
     } else {
-      setEditingBarber(null)
-      setBarberForm({ name: "", email: "", phone: "", specialties: "", active: true })
+      setEditingBarber(null);
+      setBarberForm({
+        name: "",
+        email: "",
+        phone: "",
+        specialties: "",
+        active: true,
+      });
     }
-    setIsBarberDialogOpen(true)
-  }
+    setIsBarberDialogOpen(true);
+  };
 
   const handleBarberSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     const barberData = {
       name: barberForm.name,
@@ -83,32 +110,49 @@ export default function ConfiguracoesPage() {
       phone: barberForm.phone,
       specialties: barberForm.specialties.split(",").map((s) => s.trim()),
       active: barberForm.active,
-    }
+    };
 
     if (editingBarber) {
-      updateBarber(editingBarber.id, barberData)
-      toast.success("Barbeiro atualizado!")
+      updateBarber.mutate(
+        { id: editingBarber.id, data: barberData },
+        {
+          onSuccess: () => {
+            toast.success("Barbeiro atualizado!");
+            setIsBarberDialogOpen(false);
+          },
+          onError: (error) => {
+            toast.error(`Erro: ${error.message}`);
+          },
+        },
+      );
     } else {
-      addBarber(barberData)
-      toast.success("Barbeiro adicionado!")
+      createBarber.mutate(barberData, {
+        onSuccess: () => {
+          toast.success("Barbeiro adicionado!");
+          setIsBarberDialogOpen(false);
+        },
+        onError: (error) => {
+          toast.error(`Erro: ${error.message}`);
+        },
+      });
     }
-
-    setIsBarberDialogOpen(false)
-  }
+  };
 
   const handleSaveBusinessSettings = () => {
-    toast.success("Configurações salvas com sucesso!")
-  }
+    toast.success("Configurações salvas com sucesso!");
+  };
 
   const handleSaveNotificationSettings = () => {
-    toast.success("Configurações de notificação salvas!")
-  }
+    toast.success("Configurações de notificação salvas!");
+  };
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Configurações</h1>
-        <p className="text-muted-foreground">Gerencie as configurações da sua barbearia</p>
+        <p className="text-muted-foreground">
+          Gerencie as configurações da sua barbearia
+        </p>
       </div>
 
       <Tabs defaultValue="business" className="space-y-6">
@@ -145,7 +189,12 @@ export default function ConfiguracoesPage() {
                   <Input
                     id="businessName"
                     value={businessSettings.name}
-                    onChange={(e) => setBusinessSettings((prev) => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) =>
+                      setBusinessSettings((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -153,7 +202,12 @@ export default function ConfiguracoesPage() {
                   <Input
                     id="businessPhone"
                     value={businessSettings.phone}
-                    onChange={(e) => setBusinessSettings((prev) => ({ ...prev, phone: e.target.value }))}
+                    onChange={(e) =>
+                      setBusinessSettings((prev) => ({
+                        ...prev,
+                        phone: e.target.value,
+                      }))
+                    }
                   />
                 </div>
               </div>
@@ -164,7 +218,12 @@ export default function ConfiguracoesPage() {
                   id="businessEmail"
                   type="email"
                   value={businessSettings.email}
-                  onChange={(e) => setBusinessSettings((prev) => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) =>
+                    setBusinessSettings((prev) => ({
+                      ...prev,
+                      email: e.target.value,
+                    }))
+                  }
                 />
               </div>
 
@@ -173,12 +232,19 @@ export default function ConfiguracoesPage() {
                 <Textarea
                   id="businessAddress"
                   value={businessSettings.address}
-                  onChange={(e) => setBusinessSettings((prev) => ({ ...prev, address: e.target.value }))}
+                  onChange={(e) =>
+                    setBusinessSettings((prev) => ({
+                      ...prev,
+                      address: e.target.value,
+                    }))
+                  }
                   rows={2}
                 />
               </div>
 
-              <Button onClick={handleSaveBusinessSettings}>Salvar Alterações</Button>
+              <Button onClick={handleSaveBusinessSettings}>
+                Salvar Alterações
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -189,7 +255,9 @@ export default function ConfiguracoesPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Equipe de Barbeiros</CardTitle>
-                <CardDescription>Gerencie os profissionais da barbearia</CardDescription>
+                <CardDescription>
+                  Gerencie os profissionais da barbearia
+                </CardDescription>
               </div>
               <Button onClick={() => openBarberDialog()}>
                 <Plus className="w-4 h-4 mr-2" />
@@ -199,10 +267,15 @@ export default function ConfiguracoesPage() {
             <CardContent>
               <div className="space-y-4">
                 {barbers.map((barber) => (
-                  <div key={barber.id} className="flex items-center justify-between p-4 rounded-lg border">
+                  <div
+                    key={barber.id}
+                    className="flex items-center justify-between p-4 rounded-lg border"
+                  >
                     <div className="flex items-center gap-4">
                       <Avatar className="w-12 h-12">
-                        <AvatarImage src={barber.avatar || "/placeholder.svg"} />
+                        <AvatarImage
+                          src={barber.avatar || "/placeholder.svg"}
+                        />
                         <AvatarFallback>
                           {barber.name
                             .split(" ")
@@ -212,10 +285,16 @@ export default function ConfiguracoesPage() {
                       </Avatar>
                       <div>
                         <p className="font-medium">{barber.name}</p>
-                        <p className="text-sm text-muted-foreground">{barber.email}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {barber.email}
+                        </p>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {barber.specialties.map((s) => (
-                            <Badge key={s} variant="secondary" className="text-xs">
+                            <Badge
+                              key={s}
+                              variant="secondary"
+                              className="text-xs"
+                            >
                               {s}
                             </Badge>
                           ))}
@@ -226,7 +305,11 @@ export default function ConfiguracoesPage() {
                       <Badge variant={barber.active ? "default" : "secondary"}>
                         {barber.active ? "Ativo" : "Inativo"}
                       </Badge>
-                      <Button variant="ghost" size="icon" onClick={() => openBarberDialog(barber)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => openBarberDialog(barber)}
+                      >
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button
@@ -234,8 +317,8 @@ export default function ConfiguracoesPage() {
                         size="icon"
                         className="text-destructive"
                         onClick={() => {
-                          deleteBarber(barber.id)
-                          toast.success("Barbeiro removido")
+                          deleteBarber.mutate(barber.id);
+                          toast.success("Barbeiro removido");
                         }}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -253,18 +336,25 @@ export default function ConfiguracoesPage() {
           <Card>
             <CardHeader>
               <CardTitle>Notificações</CardTitle>
-              <CardDescription>Configure lembretes e alertas automáticos</CardDescription>
+              <CardDescription>
+                Configure lembretes e alertas automáticos
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Confirmação por E-mail</p>
-                  <p className="text-sm text-muted-foreground">Enviar e-mail de confirmação ao cliente</p>
+                  <p className="text-sm text-muted-foreground">
+                    Enviar e-mail de confirmação ao cliente
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.emailConfirmation}
                   onCheckedChange={(checked) =>
-                    setNotificationSettings((prev) => ({ ...prev, emailConfirmation: checked }))
+                    setNotificationSettings((prev) => ({
+                      ...prev,
+                      emailConfirmation: checked,
+                    }))
                   }
                 />
               </div>
@@ -272,11 +362,18 @@ export default function ConfiguracoesPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Lembrete por SMS/WhatsApp</p>
-                  <p className="text-sm text-muted-foreground">Enviar lembrete antes do agendamento</p>
+                  <p className="text-sm text-muted-foreground">
+                    Enviar lembrete antes do agendamento
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.smsReminder}
-                  onCheckedChange={(checked) => setNotificationSettings((prev) => ({ ...prev, smsReminder: checked }))}
+                  onCheckedChange={(checked) =>
+                    setNotificationSettings((prev) => ({
+                      ...prev,
+                      smsReminder: checked,
+                    }))
+                  }
                 />
               </div>
 
@@ -288,9 +385,16 @@ export default function ConfiguracoesPage() {
                       type="number"
                       className="w-20"
                       value={notificationSettings.reminderHours}
-                      onChange={(e) => setNotificationSettings((prev) => ({ ...prev, reminderHours: e.target.value }))}
+                      onChange={(e) =>
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          reminderHours: e.target.value,
+                        }))
+                      }
                     />
-                    <span className="text-sm text-muted-foreground">horas antes do agendamento</span>
+                    <span className="text-sm text-muted-foreground">
+                      horas antes do agendamento
+                    </span>
                   </div>
                 </div>
               )}
@@ -298,12 +402,17 @@ export default function ConfiguracoesPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Alerta de Novo Agendamento</p>
-                  <p className="text-sm text-muted-foreground">Notificar quando houver novo agendamento</p>
+                  <p className="text-sm text-muted-foreground">
+                    Notificar quando houver novo agendamento
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.newAppointmentAlert}
                   onCheckedChange={(checked) =>
-                    setNotificationSettings((prev) => ({ ...prev, newAppointmentAlert: checked }))
+                    setNotificationSettings((prev) => ({
+                      ...prev,
+                      newAppointmentAlert: checked,
+                    }))
                   }
                 />
               </div>
@@ -311,15 +420,24 @@ export default function ConfiguracoesPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Resumo Diário</p>
-                  <p className="text-sm text-muted-foreground">Receber resumo dos agendamentos do dia</p>
+                  <p className="text-sm text-muted-foreground">
+                    Receber resumo dos agendamentos do dia
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.dailySummary}
-                  onCheckedChange={(checked) => setNotificationSettings((prev) => ({ ...prev, dailySummary: checked }))}
+                  onCheckedChange={(checked) =>
+                    setNotificationSettings((prev) => ({
+                      ...prev,
+                      dailySummary: checked,
+                    }))
+                  }
                 />
               </div>
 
-              <Button onClick={handleSaveNotificationSettings}>Salvar Configurações</Button>
+              <Button onClick={handleSaveNotificationSettings}>
+                Salvar Configurações
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -329,7 +447,9 @@ export default function ConfiguracoesPage() {
           <Card>
             <CardHeader>
               <CardTitle>Horário de Funcionamento</CardTitle>
-              <CardDescription>Configure os horários de atendimento</CardDescription>
+              <CardDescription>
+                Configure os horários de atendimento
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-4">
@@ -338,7 +458,12 @@ export default function ConfiguracoesPage() {
                   <Input
                     type="time"
                     value={businessSettings.openTime}
-                    onChange={(e) => setBusinessSettings((prev) => ({ ...prev, openTime: e.target.value }))}
+                    onChange={(e) =>
+                      setBusinessSettings((prev) => ({
+                        ...prev,
+                        openTime: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -346,7 +471,12 @@ export default function ConfiguracoesPage() {
                   <Input
                     type="time"
                     value={businessSettings.closeTime}
-                    onChange={(e) => setBusinessSettings((prev) => ({ ...prev, closeTime: e.target.value }))}
+                    onChange={(e) =>
+                      setBusinessSettings((prev) => ({
+                        ...prev,
+                        closeTime: e.target.value,
+                      }))
+                    }
                   />
                 </div>
               </div>
@@ -356,22 +486,36 @@ export default function ConfiguracoesPage() {
                 <Input
                   type="time"
                   value={businessSettings.saturdayClose}
-                  onChange={(e) => setBusinessSettings((prev) => ({ ...prev, saturdayClose: e.target.value }))}
+                  onChange={(e) =>
+                    setBusinessSettings((prev) => ({
+                      ...prev,
+                      saturdayClose: e.target.value,
+                    }))
+                  }
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Funcionar aos Domingos</p>
-                  <p className="text-sm text-muted-foreground">Habilitar agendamentos no domingo</p>
+                  <p className="text-sm text-muted-foreground">
+                    Habilitar agendamentos no domingo
+                  </p>
                 </div>
                 <Switch
                   checked={businessSettings.workSunday}
-                  onCheckedChange={(checked) => setBusinessSettings((prev) => ({ ...prev, workSunday: checked }))}
+                  onCheckedChange={(checked) =>
+                    setBusinessSettings((prev) => ({
+                      ...prev,
+                      workSunday: checked,
+                    }))
+                  }
                 />
               </div>
 
-              <Button onClick={handleSaveBusinessSettings}>Salvar Horários</Button>
+              <Button onClick={handleSaveBusinessSettings}>
+                Salvar Horários
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -381,9 +525,13 @@ export default function ConfiguracoesPage() {
       <Dialog open={isBarberDialogOpen} onOpenChange={setIsBarberDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingBarber ? "Editar Barbeiro" : "Novo Barbeiro"}</DialogTitle>
+            <DialogTitle>
+              {editingBarber ? "Editar Barbeiro" : "Novo Barbeiro"}
+            </DialogTitle>
             <DialogDescription>
-              {editingBarber ? "Atualize as informações do profissional" : "Adicione um novo profissional à equipe"}
+              {editingBarber
+                ? "Atualize as informações do profissional"
+                : "Adicione um novo profissional à equipe"}
             </DialogDescription>
           </DialogHeader>
 
@@ -392,7 +540,9 @@ export default function ConfiguracoesPage() {
               <Label>Nome Completo</Label>
               <Input
                 value={barberForm.name}
-                onChange={(e) => setBarberForm((prev) => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setBarberForm((prev) => ({ ...prev, name: e.target.value }))
+                }
                 required
               />
             </div>
@@ -403,7 +553,12 @@ export default function ConfiguracoesPage() {
                 <Input
                   type="email"
                   value={barberForm.email}
-                  onChange={(e) => setBarberForm((prev) => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) =>
+                    setBarberForm((prev) => ({
+                      ...prev,
+                      email: e.target.value,
+                    }))
+                  }
                   required
                 />
               </div>
@@ -411,7 +566,12 @@ export default function ConfiguracoesPage() {
                 <Label>Telefone</Label>
                 <Input
                   value={barberForm.phone}
-                  onChange={(e) => setBarberForm((prev) => ({ ...prev, phone: e.target.value }))}
+                  onChange={(e) =>
+                    setBarberForm((prev) => ({
+                      ...prev,
+                      phone: e.target.value,
+                    }))
+                  }
                   required
                 />
               </div>
@@ -422,7 +582,12 @@ export default function ConfiguracoesPage() {
               <Input
                 placeholder="Corte Degradê, Barba, etc."
                 value={barberForm.specialties}
-                onChange={(e) => setBarberForm((prev) => ({ ...prev, specialties: e.target.value }))}
+                onChange={(e) =>
+                  setBarberForm((prev) => ({
+                    ...prev,
+                    specialties: e.target.value,
+                  }))
+                }
               />
             </div>
 
@@ -430,19 +595,27 @@ export default function ConfiguracoesPage() {
               <Label>Barbeiro ativo</Label>
               <Switch
                 checked={barberForm.active}
-                onCheckedChange={(checked) => setBarberForm((prev) => ({ ...prev, active: checked }))}
+                onCheckedChange={(checked) =>
+                  setBarberForm((prev) => ({ ...prev, active: checked }))
+                }
               />
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsBarberDialogOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsBarberDialogOpen(false)}
+              >
                 Cancelar
               </Button>
-              <Button type="submit">{editingBarber ? "Salvar" : "Adicionar"}</Button>
+              <Button type="submit">
+                {editingBarber ? "Salvar" : "Adicionar"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
