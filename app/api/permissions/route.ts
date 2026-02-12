@@ -5,22 +5,22 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const barberId = searchParams.get("barberId");
+    const userId = searchParams.get("userId");
 
-    if (!barberId) {
+    if (!userId) {
       return NextResponse.json(
-        { error: "barberId é obrigatório" },
+        { error: "userId é obrigatório" },
         { status: 400 },
       );
     }
 
     const permissions = await prisma.permission.findMany({
       where: {
-        barberId,
+        userId,
       },
       select: {
         id: true,
-        barberId: true,
+        userId: true,
         permission: true,
         createdAt: true,
       },
@@ -40,18 +40,18 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { barberId, permission } = body;
+    const { userId, permission } = body;
 
-    if (!barberId || !permission) {
+    if (!userId || !permission) {
       return NextResponse.json(
-        { error: "barberId e permission são obrigatórios" },
+        { error: "userId e permission são obrigatórios" },
         { status: 400 },
       );
     }
 
     // Verificar se o usuário existe
     const user = await prisma.user.findUnique({
-      where: { id: barberId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     // Criar permissão
     const newPermission = await prisma.permission.create({
       data: {
-        barberId,
+        userId,
         permission,
       },
     });
@@ -100,10 +100,10 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const barberId = searchParams.get("barberId");
+    const userId = searchParams.get("userId");
     const permission = searchParams.get("permission");
 
-    if (!barberId || !permission) {
+    if (!userId || !permission) {
       return NextResponse.json(
         { error: "userId e permission são obrigatórios" },
         { status: 400 },
@@ -112,7 +112,7 @@ export async function DELETE(request: Request) {
 
     await prisma.permission.deleteMany({
       where: {
-        barberId,
+        userId,
         permission: permission as any,
       },
     });

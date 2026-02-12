@@ -35,6 +35,8 @@ import {
   User,
   CheckCircle,
   XCircle,
+  Package,
+  AlertTriangle,
 } from "lucide-react"
 
 export {
@@ -74,4 +76,6 @@ export {
   User,
   CheckCircle,
   XCircle,
+  Package,
+  AlertTriangle,
 }

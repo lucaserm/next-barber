@@ -9,29 +9,32 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(BARBER)
-  barberId  String?  @unique
-  barber    Barber?  @relation(fields: [barberId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String          @id @default(uuid())
+  name           String
+  email          String          @unique
+  password       String
+  role           Role            @default(BARBER)
+  barberId       String?         @unique
+  barber         Barber?         @relation(fields: [barberId], references: [id])
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  permissions    Permission[]
+  stockMovements StockMovement[]
 
   @@map("users")
 }
 
 model Service {
-  id           String        @id @default(uuid())
-  name         String        @unique
-  description  String
-  price        Float
-  duration     Int
-  active       Boolean       @default(true)
-  appointments Appointment[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id              String           @id @default(uuid())
+  name            String           @unique
+  description     String
+  price           Float
+  duration        Int
+  active          Boolean          @default(true)
+  appointments    Appointment[]
+  serviceProducts ServiceProduct[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@map("services")
 }
@@ -48,7 +51,6 @@ model Barber {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   appointments Appointment[]
-  permissions  Permission[]
 
   @@map("barbers")
 }
@@ -91,14 +93,91 @@ model Appointment {
 
 model Permission {
   id         String         @id @default(uuid())
-  barberId   String
-  barber     Barber         @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User           @relation(fields: [userId], references: [id])
   permission PermissionType
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
 
-  @@unique([barberId, permission])
+  @@unique([userId, permission])
   @@map("permissions")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+model Supplier {
+  id        String    @id @default(uuid())
+  name      String
+  contact   String?
+  phone     String?
+  email     String?
+  active    Boolean   @default(true)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("suppliers")
+}
+
+model Product {
+  id             String           @id @default(uuid())
+  name           String
+  description    String?
+  sku            String?          @unique
+  categoryId     String?
+  category       Category?        @relation(fields: [categoryId], references: [id])
+  currentStock   Int              @default(0)
+  minStock       Int              @default(0)
+  unitCost       Float            @default(0)
+  salePrice      Float?
+  type           ProductType      @default(BOTH)
+  supplierId     String?
+  supplier       Supplier?        @relation(fields: [supplierId], references: [id])
+  active         Boolean          @default(true)
+  stockMovements StockMovement[]
+  serviceProducts ServiceProduct[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@map("products")
+}
+
+model StockMovement {
+  id        String           @id @default(uuid())
+  productId String
+  product   Product          @relation(fields: [productId], references: [id])
+  type      MovementType
+  quantity  Int
+  reason    String?
+  notes     String?
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  createdAt DateTime         @default(now())
+
+  @@map("stock_movements")
+}
+
+model ServiceProduct {
+  id           String   @id @default(uuid())
+  serviceId    String
+  service      Service  @relation(fields: [serviceId], references: [id])
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id])
+  quantityUsed Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([serviceId, productId])
+  @@map("service_products")
 }
 
 enum Role {
@@ -122,4 +201,17 @@ enum PermissionType {
   VIEW_REPORTS
   MANAGE_BARBERS
   MANAGE_PERMISSIONS
+  MANAGE_INVENTORY
+  VIEW_INVENTORY
+}
+
+enum ProductType {
+  SALE
+  INTERNAL
+  BOTH
+}
+
+enum MovementType {
+  IN
+  OUT
 }

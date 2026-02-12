@@ -97,19 +97,19 @@ export function ProtectedRoute({
 
   if (!isAuthorized) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="max-w-md rounded-lg bg-white p-8 text-center shadow-lg">
-          <AlertCircle className="mx-auto h-16 w-16 text-red-500" />
-          <h1 className="mt-4 text-2xl font-bold text-gray-900">
+      <div className="flex min-h-screen items-center justify-center bg-secondary-light">
+        <div className="max-w-md rounded-lg bg-secondary p-8 text-center shadow-lg">
+          <AlertCircle className="mx-auto h-16 w-16 text-destructive" />
+          <h1 className="mt-4 text-2xl font-bold text-destructive-foreground">
             Acesso Negado
           </h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-foreground">
             Você não tem permissão para acessar esta página. Entre em contato
             com o administrador do sistema.
           </p>
           <button
             onClick={() => router.push("/admin")}
-            className="mt-6 rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+            className="mt-6 rounded-lg bg-destructive px-6 py-2 text-destructive-foreground hover:cursor-pointer"
           >
             Voltar ao Dashboard
           </button>

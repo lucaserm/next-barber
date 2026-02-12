@@ -6,6 +6,9 @@ export async function GET() {
   try {
     const barbers = await prisma.barber.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        user: true,
+      },
     });
     return NextResponse.json(barbers);
   } catch (error) {

@@ -74,25 +74,26 @@ function PermissoesContent() {
   const addPermission = useAddPermission();
   const removePermission = useRemovePermission();
 
-  const selectedBarberData = barbers.find((b) => b.id === selectedBarber);
+  const selectedBarberData = barbers.find((b) => b.user?.id === selectedBarber);
 
   const hasPermission = (permissionKey: string) => {
     return permissions.some((p) => p.permission === permissionKey);
   };
 
   const handleSelectBarber = (barberId: string) => {
+    if (!barberId) return;
     permissionsRefetch();
     setSelectedBarber(barberId);
   };
 
   const togglePermission = async (permissionKey: string) => {
-    if (!selectedBarberData?.userId) return;
+    if (!selectedBarberData?.user?.id) return;
 
     const has = hasPermission(permissionKey);
 
     if (has) {
       await removePermission.mutateAsync(
-        { userId: selectedBarberData.userId, permission: permissionKey },
+        { userId: selectedBarberData.user?.id, permission: permissionKey },
         {
           onSuccess: () => {
             toast.success("Permissão removida com sucesso!");
@@ -104,7 +105,7 @@ function PermissoesContent() {
       );
     } else {
       await addPermission.mutateAsync(
-        { userId: selectedBarberData.userId, permission: permissionKey },
+        { userId: selectedBarberData.user?.id, permission: permissionKey },
         {
           onSuccess: () => {
             toast.success("Permissão adicionada com sucesso!");
@@ -149,17 +150,17 @@ function PermissoesContent() {
                 .filter((b) => b.role !== "ADMIN")
                 .map((barber) => (
                   <button
-                    key={barber.id}
-                    onClick={() => handleSelectBarber(barber.id)}
+                    key={barber.user?.id}
+                    onClick={() => handleSelectBarber(barber.user?.id)}
                     className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors ${
-                      selectedBarber === barber.id
+                      selectedBarber === barber.user?.id
                         ? "bg-primary/10 border-primary"
                         : "hover:bg-secondary/50"
                     }`}
                   >
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        selectedBarber === barber.id
+                        selectedBarber === barber.user?.id
                           ? "bg-primary text-primary-foreground"
                           : "bg-secondary"
                       }`}
@@ -167,7 +168,7 @@ function PermissoesContent() {
                       <User className="w-5 h-5" />
                     </div>
                     <div className="flex-1 text-left">
-                      <p className="font-medium">{barber.name}</p>
+                      <p className="font-medium">{barber.user?.name}</p>
                       <p className="text-xs text-muted-foreground">
                         {barber.email}
                       </p>

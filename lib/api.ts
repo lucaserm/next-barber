@@ -218,8 +218,8 @@ export interface Permission {
   createdAt: string
 }
 
-export async function getUserPermissions(barberId: string): Promise<Permission[]> {
-  return fetchWithAuth(`${API_URL}/permissions?barberId=${barberId}`)
+export async function getUserPermissions(userId: string): Promise<Permission[]> {
+  return fetchWithAuth(`${API_URL}/permissions?userId=${userId}`)
 }
 
 export async function addPermission(userId: string, permission: string) {
@@ -231,6 +231,182 @@ export async function addPermission(userId: string, permission: string) {
 
 export async function removePermission(userId: string, permission: string) {
   return fetchWithAuth(`${API_URL}/permissions?userId=${userId}&permission=${permission}`, {
+    method: "DELETE",
+  })
+}
+
+// ============= INVENTÁRIO - PRODUTOS =============
+
+export interface Product {
+  id: string
+  name: string
+  description?: string
+  sku?: string
+  categoryId?: string
+  category?: Category
+  currentStock: number
+  minStock: number
+  unitCost: number
+  salePrice?: number
+  type: "SALE" | "INTERNAL" | "BOTH"
+  supplierId?: string
+  supplier?: Supplier
+  active: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export async function getProducts(params?: string): Promise<Product[]> {
+  const url = params ? `${API_URL}/products?${params}` : `${API_URL}/products`
+  return fetchWithAuth(url)
+}
+
+export async function getProduct(id: string): Promise<Product> {
+  return fetchWithAuth(`${API_URL}/products/${id}`)
+}
+
+export async function createProduct(data: Partial<Product>): Promise<Product> {
+  return fetchWithAuth(`${API_URL}/products`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function updateProduct(id: string, data: Partial<Product>): Promise<Product> {
+  return fetchWithAuth(`${API_URL}/products/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deleteProduct(id: string): Promise<void> {
+  return fetchWithAuth(`${API_URL}/products/${id}`, {
+    method: "DELETE",
+  })
+}
+
+// ============= INVENTÁRIO - CATEGORIAS =============
+
+export interface Category {
+  id: string
+  name: string
+  description?: string
+  createdAt: string
+  updatedAt: string
+  _count?: {
+    products: number
+  }
+}
+
+export async function getCategories(): Promise<Category[]> {
+  return fetchWithAuth(`${API_URL}/categories`)
+}
+
+export async function getCategory(id: string): Promise<Category> {
+  return fetchWithAuth(`${API_URL}/categories/${id}`)
+}
+
+export async function createCategory(data: Partial<Category>): Promise<Category> {
+  return fetchWithAuth(`${API_URL}/categories`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function updateCategory(id: string, data: Partial<Category>): Promise<Category> {
+  return fetchWithAuth(`${API_URL}/categories/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deleteCategory(id: string): Promise<void> {
+  return fetchWithAuth(`${API_URL}/categories/${id}`, {
+    method: "DELETE",
+  })
+}
+
+// ============= INVENTÁRIO - MOVIMENTAÇÕES =============
+
+export interface StockMovement {
+  id: string
+  productId: string
+  product: {
+    id: string
+    name: string
+    sku?: string
+  }
+  type: "IN" | "OUT"
+  quantity: number
+  reason?: string
+  notes?: string
+  userId: string
+  user: {
+    id: string
+    name: string
+  }
+  createdAt: string
+}
+
+export async function getStockMovements(params?: string): Promise<StockMovement[]> {
+  const url = params ? `${API_URL}/stock-movements?${params}` : `${API_URL}/stock-movements`
+  return fetchWithAuth(url)
+}
+
+export async function createStockMovement(data: {
+  productId: string
+  type: "IN" | "OUT"
+  quantity: number
+  reason?: string
+  notes?: string
+  userId: string
+}): Promise<StockMovement> {
+  return fetchWithAuth(`${API_URL}/stock-movements`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
+// ============= INVENTÁRIO - FORNECEDORES =============
+
+export interface Supplier {
+  id: string
+  name: string
+  contact?: string
+  phone?: string
+  email?: string
+  active: boolean
+  createdAt: string
+  updatedAt: string
+  _count?: {
+    products: number
+  }
+}
+
+export async function getSuppliers(): Promise<Supplier[]> {
+  return fetchWithAuth(`${API_URL}/suppliers`)
+}
+
+export async function getSupplier(id: string): Promise<Supplier> {
+  return fetchWithAuth(`${API_URL}/suppliers/${id}`)
+}
+
+export async function createSupplier(data: Partial<Supplier>): Promise<Supplier> {
+  return fetchWithAuth(`${API_URL}/suppliers`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function updateSupplier(id: string, data: Partial<Supplier>): Promise<Supplier> {
+  return fetchWithAuth(`${API_URL}/suppliers/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deleteSupplier(id: string): Promise<void> {
+  return fetchWithAuth(`${API_URL}/suppliers/${id}`, {
     method: "DELETE",
   })
 }

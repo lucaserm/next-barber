@@ -9,6 +9,8 @@ export type PermissionType =
   | "VIEW_REPORTS"
   | "MANAGE_BARBERS"
   | "MANAGE_PERMISSIONS"
+  | "MANAGE_INVENTORY"
+  | "VIEW_INVENTORY"
 
 export async function hasPermission(userId: string, permission: PermissionType): Promise<boolean> {
   // Buscar usuário
@@ -51,6 +53,8 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
       "VIEW_REPORTS",
       "MANAGE_BARBERS",
       "MANAGE_PERMISSIONS",
+      "MANAGE_INVENTORY",
+      "VIEW_INVENTORY",
     ]
   }
 

@@ -3,6 +3,7 @@
 import type React from "react"
 import { usePathname } from "next/navigation"
 import { AdminSidebar } from "@/components/admin/sidebar"
+import { usePermissions } from "@/lib/hooks/use-permissions"
 
 export default function AdminLayout({
   children,
@@ -10,10 +11,20 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const { isChecking } = usePermissions()
 
   // Login page doesn't need layout
   if (pathname === "/admin/login") {
     return <>{children}</>
+  }
+
+  // Mostrar loading enquanto verifica permissões
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   return (

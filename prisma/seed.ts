@@ -125,7 +125,7 @@ async function main() {
 
     // Criar usuário para o barbeiro
     const barberPassword = await bcrypt.hash("barber123", 10);
-    await prisma.user.upsert({
+    const barberUser = await prisma.user.upsert({
       where: { email: barber.email },
       update: {},
       create: {
@@ -136,7 +136,7 @@ async function main() {
         barberId: createdBarber.id,
       },
     });
-    barberUsers.push(createdBarber);
+    barberUsers.push(barberUser);
   }
 
   console.log("✅ Barbeiros criados");
@@ -161,7 +161,7 @@ async function main() {
     for (const permission of joaoPermissions) {
       await prisma.permission.create({
         data: {
-          barberId: joaoUser.id,
+          userId: joaoUser.id,
           permission: permission as any,
         },
       });
@@ -180,7 +180,7 @@ async function main() {
     for (const permission of pedroPermissions) {
       await prisma.permission.create({
         data: {
-          barberId: pedroUser.id,
+          userId: pedroUser.id,
           permission: permission as any,
         },
       });
@@ -195,7 +195,7 @@ async function main() {
     for (const permission of carlosPermissions) {
       await prisma.permission.create({
         data: {
-          barberId: carlosUser.id,
+          userId: carlosUser.id,
           permission: permission,
         },
       });

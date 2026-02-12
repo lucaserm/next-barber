@@ -1,42 +1,114 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Scissors, Home, Calendar, Users, DollarSign, Settings, LogOut, Menu, X, FileText, Shield } from "@/components/icons"
-import { useLogout, useIsAdmin } from "@/lib/hooks/use-api"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Scissors,
+  Home,
+  Calendar,
+  Users,
+  DollarSign,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  FileText,
+  Shield,
+  Package,
+} from "@/components/icons";
+import { useLogout } from "@/lib/hooks/use-api";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const navItems = [
-  { label: "Dashboard", href: "/admin", icon: Home },
-  { label: "Agenda", href: "/admin/agenda", icon: Calendar },
-  { label: "Clientes", href: "/admin/clientes", icon: Users },
-  { label: "Serviços", href: "/admin/servicos", icon: Scissors },
-  { label: "Financeiro", href: "/admin/financeiro", icon: DollarSign },
-  { label: "Relatórios", href: "/admin/relatorios", icon: FileText },
-  { label: "Configurações", href: "/admin/configuracoes", icon: Settings },
-]
+  {
+    label: "Dashboard",
+    href: "/admin",
+    icon: Home,
+    permission: "VIEW_DASHBOARD",
+  },
+  {
+    label: "Agenda",
+    href: "/admin/agenda",
+    icon: Calendar,
+    permission: "MANAGE_APPOINTMENTS",
+  },
+  {
+    label: "Clientes",
+    href: "/admin/clientes",
+    icon: Users,
+    permission: "MANAGE_CLIENTS",
+  },
+  {
+    label: "Serviços",
+    href: "/admin/servicos",
+    icon: Scissors,
+    permission: "MANAGE_SERVICES",
+  },
+  {
+    label: "Estoque",
+    href: "/admin/estoque",
+    icon: Package,
+    permission: "MANAGE_INVENTORY",
+  },
+  {
+    label: "Financeiro",
+    href: "/admin/financeiro",
+    icon: DollarSign,
+    permission: "VIEW_FINANCIAL",
+  },
+  {
+    label: "Relatórios",
+    href: "/admin/relatorios",
+    icon: FileText,
+    permission: "VIEW_REPORTS",
+  },
+  {
+    label: "Configurações",
+    href: "/admin/configuracoes",
+    icon: Settings,
+    permission: "MANAGE_BARBERS",
+  },
+];
 
 export function AdminSidebar() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const logout = useLogout()
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [user, setUser] = useState<any>(null)
+  const pathname = usePathname();
+  const router = useRouter();
+  const logout = useLogout();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [permissions, setPermissions] = useState<string[]>([]);
 
   useEffect(() => {
-    const userStr = localStorage.getItem("user")
+    const userStr = localStorage.getItem("user");
     if (userStr) {
-      setUser(JSON.parse(userStr))
+      const userData = JSON.parse(userStr);
+      setUser(userData);
+
+      // Carregar permissões do usuário
+      const userPermissions =
+        userData.role === "ADMIN"
+          ? [
+              "VIEW_DASHBOARD",
+              "MANAGE_APPOINTMENTS",
+              "MANAGE_CLIENTS",
+              "MANAGE_SERVICES",
+              "VIEW_FINANCIAL",
+              "VIEW_REPORTS",
+              "MANAGE_BARBERS",
+              "MANAGE_PERMISSIONS",
+            ]
+          : userData.permissions || [];
+      setPermissions(userPermissions);
     }
-  }, [])
+  }, []);
 
   const handleLogout = () => {
-    logout()
-  }
+    logout();
+  };
 
   const SidebarContent = () => (
     <>
@@ -44,14 +116,21 @@ export function AdminSidebar() {
       <div className="p-4 border-b border-sidebar-border">
         <Link href="/admin" className="flex items-center gap-2">
           <Scissors className="w-6 h-6 text-sidebar-primary" />
-          <span className="font-serif text-xl font-bold text-sidebar-foreground">Elite67</span>
+          <span className="font-serif text-xl font-bold text-sidebar-foreground">
+            Elite67
+          </span>
         </Link>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map((item) => {
-          const isActive = pathname === item.href
+          // Verificar se o usuário tem permissão para ver este item
+          const hasPermission =
+            user?.role === "ADMIN" || permissions.includes(item.permission);
+          if (!hasPermission) return null;
+
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
@@ -67,11 +146,12 @@ export function AdminSidebar() {
               <item.icon className="w-5 h-5" />
               {item.label}
             </Link>
-          )
+          );
         })}
-        
+
         {/* Permissões (apenas para admin) */}
-        {user?.role === "admin" && (
+        {(user?.role === "ADMIN" ||
+          permissions.includes("MANAGE_PERMISSIONS")) && (
           <Link
             href="/admin/permissoes"
             onClick={() => setMobileOpen(false)}
@@ -100,7 +180,9 @@ export function AdminSidebar() {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.name}</p>
+            <p className="text-sm font-medium text-sidebar-foreground truncate">
+              {user?.name}
+            </p>
             <p className="text-xs text-sidebar-foreground/60 truncate">
               {user?.role === "admin" ? "Administrador" : "Barbeiro"}
             </p>
@@ -116,7 +198,7 @@ export function AdminSidebar() {
         </Button>
       </div>
     </>
-  )
+  );
 
   return (
     <>
@@ -124,7 +206,9 @@ export function AdminSidebar() {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-sidebar border-b border-sidebar-border flex items-center justify-between px-4">
         <Link href="/admin" className="flex items-center gap-2">
           <Scissors className="w-5 h-5 text-sidebar-primary" />
-          <span className="font-serif text-lg font-bold text-sidebar-foreground">Elite67</span>
+          <span className="font-serif text-lg font-bold text-sidebar-foreground">
+            Elite67
+          </span>
         </Link>
         <Button
           variant="ghost"
@@ -132,14 +216,21 @@ export function AdminSidebar() {
           className="text-sidebar-foreground"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {mobileOpen ? (
+            <X className="w-5 h-5" />
+          ) : (
+            <Menu className="w-5 h-5" />
+          )}
         </Button>
       </div>
 
       {/* Mobile Sidebar */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 pt-14">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setMobileOpen(false)}
+          />
           <div className="relative w-64 h-full bg-sidebar flex flex-col">
             <SidebarContent />
           </div>
@@ -151,5 +242,5 @@ export function AdminSidebar() {
         <SidebarContent />
       </aside>
     </>
-  )
+  );
 }
