@@ -4,7 +4,7 @@ set -e
 echo "🚀 Starting Elite67..."
 
 echo "⏳ Waiting for database..."
-until pg_isready -h postgres -U barberpro > /dev/null 2>&1; do
+until pg_isready -h postgres -U docker > /dev/null 2>&1; do
   echo "⏳ Database is unavailable - sleeping"
   sleep 2
 done
