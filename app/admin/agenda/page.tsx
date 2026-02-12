@@ -73,19 +73,21 @@ function AgendaContent() {
   const appointments: Appointment[] = useMemo(() => {
     return allAppointments.map((apt: any) => ({
       id: apt.id,
+      clientId: apt.clientId,
       clientName: apt.clientName,
       clientPhone: apt.clientPhone,
       barberId: apt.barberId,
+      barberName: apt.barber?.name,
       serviceId: apt.serviceId,
+      serviceName: apt.service?.name,
+      servicePrice: apt.service?.price || 0,
       date: apt.date,
       time: apt.time,
       status: apt.status as AppointmentStatus,
-      barber: apt.barber,
-      service: apt.service,
     }));
   }, [allAppointments]);
 
-  // Filter appointments by barber
+  // Filter appointments by bar1ber
   const filteredAppointments = useMemo(
     () =>
       selectedBarber === "all"
@@ -97,13 +99,13 @@ function AgendaContent() {
   // Stats
   const todayStr = format(new Date(), "yyyy-MM-dd");
   const todayAppointments = appointments.filter(
-    (a) => a.date === todayStr && a.status !== "cancelled",
+    (a) => a.date === todayStr && a.status !== "CANCELLED",
   );
   const pendingCount = todayAppointments.filter(
-    (a) => a.status === "pending",
+    (a) => a.status === "PENDING",
   ).length;
   const confirmedCount = todayAppointments.filter(
-    (a) => a.status === "confirmed",
+    (a) => a.status === "CONFIRMED",
   ).length;
 
   // Navigation
@@ -226,12 +228,28 @@ function AgendaContent() {
       {
         onSuccess: () => {
           const labels: Record<AppointmentStatus, string> = {
-            pending: "pendente",
-            confirmed: "confirmado",
-            completed: "concluido",
-            cancelled: "cancelado",
+            PENDING: "pendente",
+            CONFIRMED: "confirmado",
+            COMPLETED: "concluido",
+            CANCELLED: "cancelado",
           };
           toast.success(`Agendamento ${labels[status]}!`);
+          setDialogOpen(false);
+          setSelectedEvent(null);
+        },
+        onError: (error) => {
+          toast.error(`Erro: ${error.message}`);
+        },
+      },
+    );
+  };
+
+  const handleUpdate = (id: string, data: any) => {
+    updateAppointment.mutate(
+      { id, data },
+      {
+        onSuccess: () => {
+          toast.success("Agendamento atualizado com sucesso!");
           setDialogOpen(false);
           setSelectedEvent(null);
         },
@@ -464,6 +482,7 @@ function AgendaContent() {
         newAppointment={newAppointment}
         onNewAppointmentChange={setNewAppointment}
         onAdd={handleAdd}
+        onUpdate={handleUpdate}
         onUpdateStatus={handleUpdateStatus}
         onDelete={handleDelete}
         barbers={barbers}

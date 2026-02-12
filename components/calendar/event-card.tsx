@@ -10,28 +10,28 @@ const statusConfig: Record<
   AppointmentStatus,
   { bg: string; border: string; text: string; dot: string; label: string }
 > = {
-  pending: {
+  PENDING: {
     bg: "bg-secondary",
     border: "border-primary",
     text: "text-primary",
     dot: "bg-primary",
     label: "Pendente",
   },
-  confirmed: {
+  CONFIRMED: {
     bg: "bg-emerald-500",
     border: "border-l-emerald-500",
     text: "text-foreground",
     dot: "bg-foreground",
     label: "Confirmado",
   },
-  completed: {
+  COMPLETED: {
     bg: "bg-sky-500",
     border: "border-l-sky-500",
     text: "text-foreground",
     dot: "bg-foreground",
     label: "Concluido",
   },
-  cancelled: {
+  CANCELLED: {
     bg: "bg-red-500",
     border: "border-l-red-400",
     text: "text-red-600",
@@ -55,9 +55,8 @@ export function EventCard({
   compact = false,
   heightPx,
 }: EventCardProps) {
-  const config =
-    statusConfig[appointment.status.toLowerCase() as AppointmentStatus];
-  const isCancelled = appointment.status === "cancelled";
+  const config = statusConfig[appointment.status as AppointmentStatus];
+  const isCancelled = appointment.status === "CANCELLED";
 
   return (
     <button

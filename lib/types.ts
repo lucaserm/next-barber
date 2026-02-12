@@ -29,7 +29,11 @@ export interface Client {
   totalSpent: number;
 }
 
-export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled";
+export type AppointmentStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "COMPLETED"
+  | "CANCELLED";
 
 export interface Appointment {
   id: string;

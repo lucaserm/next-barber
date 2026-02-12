@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hasPermission } from "@/lib/permissions";
 
-// GET /api/products - List all products
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -52,7 +50,7 @@ export async function GET(request: Request) {
     console.error("Error fetching products:", error);
     return NextResponse.json(
       { error: "Failed to fetch products" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -79,7 +77,7 @@ export async function POST(request: Request) {
     if (!name) {
       return NextResponse.json(
         { error: "Product name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -108,7 +106,7 @@ export async function POST(request: Request) {
     console.error("Error creating product:", error);
     return NextResponse.json(
       { error: "Failed to create product" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
