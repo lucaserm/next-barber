@@ -57,7 +57,7 @@ export async function GET(request: Request) {
     // Receita por barbeiro
     const revenueByBarber = completedAppointments.reduce(
       (acc, a) => {
-        const barberName = a.barber.user.name
+        const barberName = a.barber?.user?.name
         if (!acc[barberName]) {
           acc[barberName] = { name: barberName, revenue: 0, count: 0 }
         }

@@ -67,19 +67,19 @@ function EstoqueContent() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Gestão de Estoque</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl sm:text-2xl font-bold">Gestão de Estoque</h1>
+          <p className="text-sm text-muted-foreground">
             Controle seus produtos e movimentações
           </p>
         </div>
         <div className="flex gap-2">
           <ProductDialog
             trigger={
-              <Button>
+              <Button className="flex-1 sm:flex-none">
                 <Plus className="w-4 h-4 mr-2" />
                 Novo Produto
               </Button>
@@ -128,8 +128,8 @@ function EstoqueContent() {
 
       {/* Filtros */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="grid gap-4 md:grid-cols-4">
+        <CardContent className="pt-4 sm:pt-6">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
             <div className="relative">
               <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
               <Input
@@ -166,6 +166,7 @@ function EstoqueContent() {
             <Button
               variant={showLowStock ? "default" : "outline"}
               onClick={() => setShowLowStock(!showLowStock)}
+              className="w-full"
             >
               <AlertTriangle className="w-4 h-4 mr-2" />
               Estoque Baixo
@@ -191,11 +192,11 @@ function EstoqueContent() {
               {filteredProducts.map((product: any) => (
                 <div
                   key={product.id}
-                  className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 rounded-lg border hover:bg-accent gap-3"
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium">{product.name}</h3>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-medium truncate">{product.name}</h3>
                       {product.sku && (
                         <Badge variant="outline" className="text-xs">
                           {product.sku}
@@ -209,6 +210,7 @@ function EstoqueContent() {
                               ? "secondary"
                               : "outline"
                         }
+                        className="text-xs"
                       >
                         {product.type === "SALE"
                           ? "Venda"
@@ -217,24 +219,25 @@ function EstoqueContent() {
                             : "Ambos"}
                       </Badge>
                       {product.currentStock <= product.minStock && (
-                        <Badge variant="destructive">Estoque Baixo</Badge>
+                        <Badge variant="destructive" className="text-xs">Estoque Baixo</Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-3 sm:gap-4 mt-1 text-xs sm:text-sm text-muted-foreground flex-wrap">
                       <span>Estoque: {product.currentStock}</span>
                       <span>Mínimo: {product.minStock}</span>
-                      {product.category && <span>{product.category.name}</span>}
+                      {product.category && <span className="hidden sm:inline">{product.category.name}</span>}
                       <span>Custo: R$ {product.unitCost.toFixed(2)}</span>
                       {product.salePrice && (
-                        <span>Venda: R$ {product.salePrice.toFixed(2)}</span>
+                        <span className="hidden sm:inline">Venda: R$ {product.salePrice.toFixed(2)}</span>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 justify-end sm:justify-start">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setMovementProduct(product)}
+                      className="flex-1 sm:flex-none text-xs"
                     >
                       Movimentar
                     </Button>
@@ -243,7 +246,7 @@ function EstoqueContent() {
                       categories={categories}
                       suppliers={suppliers}
                       trigger={
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" className="shrink-0">
                           <Edit className="w-4 h-4" />
                         </Button>
                       }

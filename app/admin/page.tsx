@@ -64,62 +64,62 @@ function AdminDashboardContent() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">
+        <h1 className="text-xl sm:text-2xl font-bold">
           Olá, {user?.name?.split(" ")[0] || "Admin"}!
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           Aqui está o resumo do seu negócio
         </p>
       </div>
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Receita do Mês
               </CardTitle>
               <DollarSign className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-lg sm:text-2xl font-bold">
                 R$ {stats.summary.totalRevenue.toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stats.summary.completedAppointments} atendimentos concluídos
+                {stats.summary.completedAppointments} atendimentos
               </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Agendamentos
               </CardTitle>
               <Calendar className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-lg sm:text-2xl font-bold">
                 {stats.summary.totalAppointments}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Taxa de conclusão: {stats.summary.completionRate.toFixed(1)}%
+                {stats.summary.completionRate.toFixed(1)}% conclusão
               </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Ticket Médio
               </CardTitle>
               <TrendingUp className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-lg sm:text-2xl font-bold">
                 R$ {stats.summary.averageTicket.toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
@@ -129,14 +129,14 @@ function AdminDashboardContent() {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Hoje
               </CardTitle>
               <Users className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-lg sm:text-2xl font-bold">
                 {todayAppointments.length}
               </div>
               <p className="text-xs text-muted-foreground mt-1">Agendamentos</p>
@@ -147,12 +147,12 @@ function AdminDashboardContent() {
 
       {/* Charts */}
       {stats && (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
           {/* Revenue Chart */}
           <Card>
             <CardHeader>
-              <CardTitle>Receita Mensal</CardTitle>
-              <p className="text-sm text-muted-foreground">Últimos 6 meses</p>
+              <CardTitle className="text-base sm:text-lg">Receita Mensal</CardTitle>
+              <p className="text-xs sm:text-sm text-muted-foreground">Últimos 6 meses</p>
             </CardHeader>
             <CardContent>
               <ChartContainer
@@ -162,7 +162,7 @@ function AdminDashboardContent() {
                     color: "hsl(var(--primary))",
                   },
                 }}
-                className="h-[300px]"
+                className="h-[250px] sm:h-[300px]"
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={stats.monthlyRevenue}>
@@ -189,8 +189,8 @@ function AdminDashboardContent() {
           {/* Services Chart */}
           <Card>
             <CardHeader>
-              <CardTitle>Serviços Mais Populares</CardTitle>
-              <p className="text-sm text-muted-foreground">
+              <CardTitle className="text-base sm:text-lg">Serviços Mais Populares</CardTitle>
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Por quantidade de atendimentos
               </p>
             </CardHeader>
@@ -202,7 +202,7 @@ function AdminDashboardContent() {
                     color: "hsl(var(--primary))",
                   },
                 }}
-                className="h-[300px]"
+                className="h-[250px] sm:h-[300px]"
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={stats.revenueByService.slice(0, 5)}>
@@ -225,8 +225,8 @@ function AdminDashboardContent() {
       {/* Today's Appointments */}
       <Card>
         <CardHeader>
-          <CardTitle>Agendamentos de Hoje</CardTitle>
-          <p className="text-sm text-muted-foreground">
+          <CardTitle className="text-base sm:text-lg">Agendamentos de Hoje</CardTitle>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
           </p>
         </CardHeader>
@@ -234,29 +234,29 @@ function AdminDashboardContent() {
           {todayAppointments.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Calendar className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>Nenhum agendamento para hoje</p>
+              <p className="text-sm">Nenhum agendamento para hoje</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {todayAppointments.map((appointment: any) => (
                 <div
                   key={appointment.id}
-                  className="flex items-center justify-between p-4 rounded-lg border bg-card"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 rounded-lg border bg-card gap-3"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                      <Clock className="w-6 h-6 text-primary" />
+                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                    <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 shrink-0">
+                      <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                     </div>
-                    <div>
-                      <p className="font-medium">{appointment.clientName}</p>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm sm:text-base truncate">{appointment.clientName}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground truncate">
                         {appointment.service?.name} •{" "}
                         {appointment.barber?.user?.name}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold">{appointment.time}</p>
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:text-right">
+                    <p className="font-semibold text-sm sm:text-base">{appointment.time}</p>
                     <Badge
                       variant={
                         appointment.status === "COMPLETED"
@@ -267,6 +267,7 @@ function AdminDashboardContent() {
                               ? "outline"
                               : "destructive"
                       }
+                      className="text-xs"
                     >
                       {appointment.status === "COMPLETED"
                         ? "Concluído"

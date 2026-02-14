@@ -16,12 +16,21 @@ export const metadata: Metadata = {
     "Sistema completo de gestão para barbearias. Agendamento online, controle financeiro, gestão de clientes e muito mais.",
   generator: "v0.app",
   keywords: ["barbearia", "agendamento", "gestão", "barber", "corte de cabelo"],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Elite67",
+  },
 }
 
 export const viewport: Viewport = {
   themeColor: "#1a1a1a",
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
 }
 
 export default function RootLayout({

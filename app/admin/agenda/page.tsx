@@ -292,7 +292,7 @@ function AgendaContent() {
   }
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex flex-col lg:flex-row h-screen bg-background">
       <aside className="w-72 shrink-0 border-r border-border bg-card flex flex-col hidden lg:flex">
         <div className="px-4 py-4">
           <MiniCalendar
@@ -375,10 +375,10 @@ function AgendaContent() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 h-full lg:h-auto">
         {/* Toolbar */}
-        <header className="flex items-center justify-between px-4 lg:px-6 py-3 border-b border-border bg-card shrink-0">
-          <div className="flex items-center gap-3">
+        <header className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between px-3 sm:px-4 lg:px-6 py-3 border-b border-border bg-card shrink-0 gap-3 sm:gap-2">
+          <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -405,53 +405,72 @@ function AgendaContent() {
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
-            <h2 className="text-sm font-semibold text-foreground capitalize hidden sm:block">
+            <h2 className="text-xs sm:text-sm font-semibold text-foreground capitalize flex-1 sm:flex-none">
               {title}
             </h2>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-between sm:justify-end">
+            {/* Filtro de barbeiro mobile */}
+            <div className="lg:hidden flex-1 sm:flex-none sm:w-40">
+              <Select value={selectedBarber} onValueChange={setSelectedBarber}>
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="Barbeiro" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  {barbers
+                    .filter((b: any) => b.active)
+                    .map((barber: any) => (
+                      <SelectItem key={barber.id} value={barber.id}>
+                        {barber.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* View toggle */}
             <div className="flex items-center bg-muted rounded-md p-0.5">
               <button
                 type="button"
                 onClick={() => setView("week")}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-all ${
+                className={`flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 rounded text-xs font-medium transition-all ${
                   view === "week"
                     ? "bg-card text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
-                Semana
+                <span className="hidden sm:inline">Semana</span>
               </button>
               <button
                 type="button"
                 onClick={() => setView("day")}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-all ${
+                className={`flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 rounded text-xs font-medium transition-all ${
                   view === "day"
                     ? "bg-card text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <CalendarDays className="w-3.5 h-3.5" />
-                Dia
+                <span className="hidden sm:inline">Dia</span>
               </button>
             </div>
 
             <Button
               size="sm"
               onClick={() => openNewDialog()}
-              className="text-xs"
+              className="text-xs h-8 px-2 sm:px-3"
             >
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
-              Novo Agendamento
+              <Plus className="w-3.5 h-3.5 sm:mr-1.5" />
+              <span className="hidden sm:inline">Novo</span>
             </Button>
           </div>
         </header>
 
         {/* Calendar */}
-        <div className="flex-1 overflow-hidden bg-card">
+        <div className="flex-1 overflow-auto bg-card">
           {view === "week" ? (
             <WeekView
               currentDate={currentDate}

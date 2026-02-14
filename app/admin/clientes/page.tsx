@@ -134,19 +134,19 @@ function ClientesContent() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Clientes</h1>
-          <p className="text-muted-foreground">Gerencie a base de clientes da barbearia</p>
+          <h1 className="text-xl sm:text-2xl font-bold">Clientes</h1>
+          <p className="text-sm text-muted-foreground">Gerencie a base de clientes da barbearia</p>
         </div>
-        <Button onClick={openCreateDialog}>
+        <Button onClick={openCreateDialog} className="sm:w-auto">
           <UserPlus className="w-4 h-4 mr-2" />
           Novo Cliente
         </Button>
       </div>
 
-      <div className="relative max-w-sm">
+      <div className="relative max-w-full sm:max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="Buscar por nome, e-mail ou telefone..."
@@ -156,15 +156,16 @@ function ClientesContent() {
         />
       </div>
 
-      <Card>
+      {/* Desktop Table */}
+      <Card className="hidden md:block">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Cliente</TableHead>
-                <TableHead className="hidden sm:table-cell">Contato</TableHead>
-                <TableHead className="hidden md:table-cell">Visitas</TableHead>
-                <TableHead className="hidden md:table-cell">Total Gasto</TableHead>
+                <TableHead>Contato</TableHead>
+                <TableHead>Visitas</TableHead>
+                <TableHead>Total Gasto</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -183,11 +184,10 @@ function ClientesContent() {
                       </Avatar>
                       <div>
                         <p className="font-medium">{client.name}</p>
-                        <p className="text-xs text-muted-foreground sm:hidden">{client.phone}</p>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell">
+                  <TableCell>
                     <div className="space-y-1 text-sm">
                       <div className="flex items-center gap-1 text-muted-foreground">
                         <Phone className="w-3 h-3" />
@@ -199,10 +199,10 @@ function ClientesContent() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell>
                     <Badge variant="secondary">{client.totalVisits} visitas</Badge>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell>
                     <span className="font-medium">R$ {client.totalSpent.toLocaleString("pt-BR")}</span>
                   </TableCell>
                   <TableCell className="text-right">
@@ -235,6 +235,82 @@ function ClientesContent() {
           )}
         </CardContent>
       </Card>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {filteredClients.length === 0 ? (
+          <Card>
+            <CardContent className="text-center py-12">
+              <p className="text-muted-foreground">Nenhum cliente encontrado.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          filteredClients.map((client) => (
+            <Card key={client.id}>
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3 mb-3">
+                  <Avatar className="w-10 h-10">
+                    <AvatarFallback>
+                      {client.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium truncate">{client.name}</h3>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                      <Phone className="w-3 h-3" />
+                      <span>{client.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Mail className="w-3 h-3" />
+                      <span className="truncate">{client.email}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4 mb-3 text-sm">
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <Calendar className="w-4 h-4" />
+                    <span>{client.totalVisits} visitas</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <DollarSign className="w-4 h-4" />
+                    <span>R$ {client.totalSpent.toLocaleString("pt-BR")}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setViewingClient(client)}
+                    className="flex-1"
+                  >
+                    Ver Detalhes
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => openEditDialog(client)}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="text-destructive"
+                    onClick={() => setDeleteId(client.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>

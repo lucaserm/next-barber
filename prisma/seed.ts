@@ -19,7 +19,7 @@ async function main() {
   console.log("🗑️  Permissões antigas removidas");
 
   // Criar usuário admin
-  const hashedPassword = await bcrypt.hash("admin123", 10);
+  const hashedPassword = await bcrypt.hash("admin1234", 10);
   const admin = await prisma.user.upsert({
     where: { email: "admin@barberpro.com" },
     update: {},
@@ -124,7 +124,7 @@ async function main() {
     });
 
     // Criar usuário para o barbeiro
-    const barberPassword = await bcrypt.hash("barber123", 10);
+    const barberPassword = await bcrypt.hash("barber1234", 10);
     const barberUser = await prisma.user.upsert({
       where: { email: barber.email },
       update: {},
@@ -242,22 +242,22 @@ async function main() {
   console.log("\n📝 CREDENCIAIS DE ACESSO:\n");
   console.log("👑 ADMIN (Acesso Total):");
   console.log("   Email: admin@barberpro.com");
-  console.log("   Senha: admin123");
+  console.log("   Senha: admin1234");
   console.log("   Permissões: TODAS\n");
   console.log("👨 BARBEIROS:\n");
   console.log("   1️⃣  João Silva (Acesso Completo)");
   console.log("       Email: joao@barberpro.com");
-  console.log("       Senha: barber123");
+  console.log("       Senha: barber1234");
   console.log(
     "       Permissões: Dashboard, Agenda, Clientes, Serviços, Financeiro, Relatórios\n",
   );
   console.log("   2️⃣  Pedro Santos (Acesso Médio)");
   console.log("       Email: pedro@barberpro.com");
-  console.log("       Senha: barber123");
+  console.log("       Senha: barber1234");
   console.log("       Permissões: Dashboard, Agenda, Clientes\n");
   console.log("   3️⃣  Carlos Oliveira (Acesso Limitado)");
   console.log("       Email: carlos@barberpro.com");
-  console.log("       Senha: barber123");
+  console.log("       Senha: barber1234");
   console.log("       Permissões: Dashboard apenas\n");
   console.log("=".repeat(60));
 }

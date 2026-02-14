@@ -5,7 +5,7 @@
 
 /* Tema premium de barbearia - preto, grafite, dourado/amber */
 :root {
-  --background: oklch(0.98 0 0);
+  --background: oklch(0.98` 0 0);
   --foreground: oklch(0.15 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0 0);
@@ -123,5 +123,36 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    html {
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Ensure touch targets are at least 44x44 */
+    button, a {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Smooth scrolling */
+    * {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+  
+  /* Better mobile inputs */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Prevent zoom on iOS */
+  @supports (-webkit-touch-callout: none) {
+    input, textarea, select {
+      font-size: 16px !important;
+    }
   }
 }

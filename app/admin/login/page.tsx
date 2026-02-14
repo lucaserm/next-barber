@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,28 @@ export default function LoginPage() {
   const login = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isChecking, setIsChecking] = useState(true);
+
+  // Verificar se usuário já está logado
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const token = localStorage.getItem("token");
+        const user = localStorage.getItem("user");
+        
+        if (token && user) {
+          const userData = JSON.parse(user);
+          redirectFn(userData);
+        } else {
+          setIsChecking(false);
+        }
+      } catch (error) {
+        setIsChecking(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,29 +56,7 @@ export default function LoginPage() {
         onSuccess: (data) => {
           toast.success(`Bem-vindo, ${data.user.name}!`);
 
-          // Determinar primeira rota disponível baseada nas permissões
-          const permissions =
-            data.user.role === "ADMIN"
-              ? ["VIEW_DASHBOARD"]
-              : data.user.permissions || [];
-
-          const routePermissions = [
-            { path: "/admin", permission: "VIEW_DASHBOARD" },
-            { path: "/admin/agenda", permission: "MANAGE_APPOINTMENTS" },
-            { path: "/admin/clientes", permission: "MANAGE_CLIENTS" },
-            { path: "/admin/servicos", permission: "MANAGE_SERVICES" },
-            { path: "/admin/estoque", permission: "MANAGE_INVENTORY" },
-            { path: "/admin/financeiro", permission: "VIEW_FINANCIAL" },
-            { path: "/admin/relatorios", permission: "VIEW_REPORTS" },
-            { path: "/admin/configuracoes", permission: "MANAGE_BARBERS" },
-            { path: "/admin/permissoes", permission: "MANAGE_PERMISSIONS" },
-          ];
-
-          const firstAvailableRoute = routePermissions.find((r) =>
-            permissions.includes(r.permission),
-          );
-
-          router.push(firstAvailableRoute?.path || "/admin");
+          redirectFn(data.user);
         },
         onError: (error) => {
           toast.error(error.message || "E-mail ou senha inválidos");
@@ -64,6 +64,41 @@ export default function LoginPage() {
       },
     );
   };
+
+  const redirectFn = (user) => {
+    // Determinar primeira rota disponível baseada nas permissões
+    const permissions =
+      user.role === "ADMIN"
+        ? ["VIEW_DASHBOARD"]
+        : user.permissions || [];
+
+    const routePermissions = [
+      { path: "/admin", permission: "VIEW_DASHBOARD" },
+      { path: "/admin/agenda", permission: "MANAGE_APPOINTMENTS" },
+      { path: "/admin/clientes", permission: "MANAGE_CLIENTS" },
+      { path: "/admin/servicos", permission: "MANAGE_SERVICES" },
+      { path: "/admin/estoque", permission: "MANAGE_INVENTORY" },
+      { path: "/admin/financeiro", permission: "VIEW_FINANCIAL" },
+      { path: "/admin/relatorios", permission: "VIEW_REPORTS" },
+      { path: "/admin/configuracoes", permission: "MANAGE_BARBERS" },
+      { path: "/admin/permissoes", permission: "MANAGE_PERMISSIONS" },
+    ];
+
+    const firstAvailableRoute = routePermissions.find((r) =>
+      permissions.includes(r.permission),
+    );
+
+    router.push(firstAvailableRoute?.path || "/admin");
+  };
+
+  // Mostrar loading enquanto verifica autenticação
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-secondary/20">
