@@ -11,14 +11,5 @@ done
 
 echo "✅ Database is up!"
 
-echo "🔄 Running migrations..."
-./node_modules/.bin/prisma migrate deploy || {
-  echo "❌ Migrations failed"
-  exit 1
-}
-
-echo "🌱 Seeding database..."
-./node_modules/.bin/prisma db seed || echo "⚠️ Seed skipped (already seeded or no seed file)"
-
-echo "🎉 Starting application..."
-exec node server.js
+# Use the orchestrated migration + seed + start flow
+node scripts/migrate-and-start.js
