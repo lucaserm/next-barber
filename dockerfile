@@ -65,8 +65,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
 # Copiar script de entrada
-COPY docker-entrypoint.sh ./
-RUN chmod +x docker-entrypoint.sh
+COPY scripts/migrate-and-start.js ./
 
 # Ajustar permissões
 RUN chown -R nextjs:nodejs /app
