@@ -1,78 +1,55 @@
 const { spawn } = require("child_process");
-const path = require("path");
 
-async function runMigrations() {
+async function runCommand(command, args = []) {
   return new Promise((resolve, reject) => {
-    console.log("🔄 Running database migrations...");
-
-    const migrate = spawn("prisma", ["migrate", "deploy"], {
+    const proc = spawn(command, args, {
       stdio: "inherit",
       shell: true,
-      env: {
-        ...process.env,
-        PATH: `${path.join(process.cwd(), "node_modules/.bin")}:${process.env.PATH}`,
-      },
     });
 
-    migrate.on("close", (code) => {
+    proc.on("close", (code) => {
       if (code === 0) {
-        console.log("✅ Migrations completed successfully");
         resolve();
       } else {
-        console.error(`❌ Migrations failed with code ${code}`);
-        reject(new Error(`Migration failed with exit code ${code}`));
+        reject(new Error(`Command failed with exit code ${code}`));
       }
     });
 
-    migrate.on("error", (error) => {
-      console.error("❌ Failed to run migrations:", error);
+    proc.on("error", (error) => {
       reject(error);
     });
   });
 }
 
+async function runMigrations() {
+  console.log("🔄 Running database migrations...");
+  try {
+    await runCommand("npm", ["run", "db:migrate"]);
+    console.log("✅ Migrations completed successfully");
+  } catch (error) {
+    console.error("❌ Migrations failed:", error.message);
+    throw error;
+  }
+}
+
 async function runSeed() {
-  return new Promise((resolve, reject) => {
-    console.log("🌱 Seeding database...");
-
-    const seed = spawn("tsx", ["prisma/seed.ts"], {
-      stdio: "inherit",
-      shell: true,
-      env: {
-        ...process.env,
-        PATH: `${path.join(process.cwd(), "node_modules/.bin")}:${process.env.PATH}`,
-      },
-    });
-
-    seed.on("close", (code) => {
-      if (code === 0) {
-        console.log("✅ Seed completed successfully");
-        resolve();
-      } else {
-        console.warn(`⚠️  Seed skipped (code ${code}, might be already seeded)`);
-        resolve();
-      }
-    });
-
-    seed.on("error", (error) => {
-      console.warn("⚠️  Seed error (optional):", error.message);
-      resolve();
-    });
-  });
+  console.log("🌱 Seeding database...");
+  try {
+    await runCommand("npm", ["run", "db:seed"]);
+    console.log("✅ Seed completed successfully");
+  } catch (error) {
+    console.warn("⚠️  Seed error (optional):", error.message);
+  }
 }
 
 async function startServer() {
   console.log("🚀 Starting Next.js server...");
-
-  const server = spawn("node", ["server.js"], {
-    stdio: "inherit",
-    shell: true,
-  });
-
-  server.on("error", (error) => {
-    console.error("❌ Failed to start server:", error);
+  try {
+    await runCommand("node", ["server.js"]);
+  } catch (error) {
+    console.error("❌ Failed to start server:", error.message);
     process.exit(1);
-  });
+  }
 }
 
 async function main() {

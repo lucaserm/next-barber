@@ -5,18 +5,22 @@ FROM node:22-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
+# Instalar pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 # Copiar arquivos de dependências
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY prisma ./prisma/
 
-# Instalar dependências com npm (pnpm not available in container)
-RUN npm install
+# Instalar dependências
+RUN pnpm install --frozen-lockfile
 
 # Stage 2: Builder
 FROM node:22-alpine AS builder
 WORKDIR /app
 
-# Instalar build tools e OpenSSL
+# Instalar pnpm e ferramentas de build
+RUN corepack enable && corepack prepare pnpm@latest --activate
 RUN apk add --no-cache build-base python3 openssl
 
 # Copiar dependências do stage anterior
