@@ -2,28 +2,22 @@
 
 # Stage 1: Dependencies
 FROM node:22-alpine AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
-
-# Instalar pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copiar arquivos de dependências
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY prisma ./prisma/
 
-# Instalar dependências
-RUN pnpm install --frozen-lockfile
+# Instalar dependências com npm (pnpm not available in container)
+RUN npm install
 
 # Stage 2: Builder
 FROM node:22-alpine AS builder
 WORKDIR /app
 
-# Instalar pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Instalar ferramentas de build para módulos nativos
-RUN apk add --no-cache build-base python3
+# Instalar build tools e OpenSSL
+RUN apk add --no-cache build-base python3 openssl
 
 # Copiar dependências do stage anterior
 COPY --from=deps /app/node_modules ./node_modules
@@ -34,15 +28,18 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
 # Gerar Prisma Client
-RUN pnpm exec prisma generate
+RUN npx prisma generate
 
 # Build da aplicação Next.js com tratamento de erros
-RUN pnpm build || true && \
+RUN npm run build || true && \
     test -d /app/.next/standalone
 
 # Stage 3: Runner
 FROM node:22-alpine AS runner
 WORKDIR /app
+
+# Instalar OpenSSL runtime
+RUN apk add --no-cache openssl
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
