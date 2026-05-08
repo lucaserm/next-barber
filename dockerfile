@@ -13,7 +13,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY prisma ./prisma/
 
 # Instalar dependências
-RUN pnpm install --frozen-lockfile 
+RUN pnpm install --frozen-lockfile
 
 # Stage 2: Builder
 FROM node:22-alpine AS builder
@@ -40,7 +40,7 @@ RUN pnpm exec prisma generate
 RUN pnpm build || true && \
     test -d /app/.next/standalone
 
-# Stage 3: Runner  
+# Stage 3: Runner
 FROM node:22-alpine AS runner
 WORKDIR /app
 
@@ -79,5 +79,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Usar script de entrada
-CMD ["./docker-entrypoint.sh"]
-
+CMD ["node scripts/migrate-and-start.js"]
