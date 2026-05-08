@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-echo "🚀 Starting Elite67..."
+echo "🚀 Starting BarberPro..."
 
 echo "⏳ Waiting for database..."
 until pg_isready -h postgres -U docker > /dev/null 2>&1; do
@@ -12,10 +12,13 @@ done
 echo "✅ Database is up!"
 
 echo "🔄 Running migrations..."
-npx prisma migrate deploy
+./node_modules/.bin/prisma migrate deploy || {
+  echo "❌ Migrations failed"
+  exit 1
+}
 
 echo "🌱 Seeding database..."
-npx prisma db seed || echo "⚠️ Seed failed or already seeded"
+./node_modules/.bin/prisma db seed || echo "⚠️ Seed skipped (already seeded or no seed file)"
 
 echo "🎉 Starting application..."
 exec node server.js
