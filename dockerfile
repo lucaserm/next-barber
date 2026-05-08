@@ -13,7 +13,8 @@ COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 
 # Instalar dependências
-RUN pnpm install 
+RUN pnpm config set allow-scripts "*"
+RUN pnpm install --frozen-lockfile 
 
 # Stage 2: Builder
 FROM node:22-alpine AS builder
