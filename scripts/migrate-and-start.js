@@ -5,7 +5,7 @@ async function runMigrations() {
   return new Promise((resolve, reject) => {
     console.log("🔄 Running database migrations...");
 
-    const migrate = spawn("pnpm", ["db:migrate"], {
+    const migrate = spawn("prisma", ["migrate", "deploy"], {
       stdio: "inherit",
       shell: true,
       env: {
@@ -35,7 +35,7 @@ async function runSeed() {
   return new Promise((resolve, reject) => {
     console.log("🌱 Seeding database...");
 
-    const seed = spawn("pnpm", ["db:seed"], {
+    const seed = spawn("tsx", ["prisma/seed.ts"], {
       stdio: "inherit",
       shell: true,
       env: {
