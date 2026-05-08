@@ -13,7 +13,7 @@ COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 
 # Instalar dependências
-RUN pnpm install --frozen-lockfile
+RUN pnpm install 
 
 # Stage 2: Builder
 FROM node:22-alpine AS builder
@@ -64,8 +64,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
-# Copiar script de entrada e scripts de utilidade
-COPY scripts ./scripts
+# Copiar script de entrada
 COPY docker-entrypoint.sh ./
 RUN chmod +x docker-entrypoint.sh
 
