@@ -55,8 +55,7 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/node_modules ./node_modules
 
 # Copiar Prisma schema e migrations
-COPY --from=builder /app/prisma/schema.prisma ./prisma/
-COPY --from=builder /app/prisma/migrations ./prisma/migrations
+COPY --from=builder /app/prisma ./prisma
 
 # Copiar arquivos públicos
 COPY --from=builder /app/public ./public

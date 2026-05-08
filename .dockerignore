@@ -47,8 +47,5 @@ next-env.d.ts
 *.swp
 *.swo
 
-# Prisma
-prisma/migrations
-
 # Backups
 *.backup
