@@ -159,8 +159,15 @@ async function main() {
     ];
 
     for (const permission of joaoPermissions) {
-      await prisma.permission.create({
-        data: {
+      await prisma.permission.upsert({
+        where: {
+          userId_permission: {
+            userId: joaoUser.id,
+            permission: permission as any,
+          },
+        },
+        update: {},
+        create: {
           userId: joaoUser.id,
           permission: permission as any,
         },
@@ -178,8 +185,15 @@ async function main() {
     ];
 
     for (const permission of pedroPermissions) {
-      await prisma.permission.create({
-        data: {
+      await prisma.permission.upsert({
+        where: {
+          userId_permission: {
+            userId: pedroUser.id,
+            permission: permission as any,
+          },
+        },
+        update: {},
+        create: {
           userId: pedroUser.id,
           permission: permission as any,
         },
@@ -193,8 +207,15 @@ async function main() {
     const carlosPermissions = ["VIEW_DASHBOARD"] as PermissionType[];
 
     for (const permission of carlosPermissions) {
-      await prisma.permission.create({
-        data: {
+      await prisma.permission.upsert({
+        where: {
+          userId_permission: {
+            userId: carlosUser.id,
+            permission: permission,
+          },
+        },
+        update: {},
+        create: {
           userId: carlosUser.id,
           permission: permission,
         },
