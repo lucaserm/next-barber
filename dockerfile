@@ -9,11 +9,10 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copiar arquivos de dependências
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY prisma ./prisma/
 
 # Instalar dependências
-RUN pnpm config set allow-scripts "*"
 RUN pnpm install --frozen-lockfile 
 
 # Stage 2: Builder
