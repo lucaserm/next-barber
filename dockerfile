@@ -79,4 +79,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Usar script de entrada
-CMD ["node scripts/migrate-and-start.js"]
+CMD ["node", "scripts/migrate-and-start.js"]
