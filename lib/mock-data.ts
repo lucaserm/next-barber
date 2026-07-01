@@ -151,7 +151,7 @@ export const appointments: Appointment[] = [
     servicePrice: 70,
     date: formatDate(today),
     time: "09:00",
-    status: "confirmed",
+    status: "CONFIRMED",
     createdAt: formatDate(new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000)),
   },
   {
@@ -166,7 +166,7 @@ export const appointments: Appointment[] = [
     servicePrice: 45,
     date: formatDate(today),
     time: "10:00",
-    status: "pending",
+    status: "PENDING",
     createdAt: formatDate(new Date(today.getTime() - 1 * 24 * 60 * 60 * 1000)),
   },
   {
@@ -181,7 +181,7 @@ export const appointments: Appointment[] = [
     servicePrice: 70,
     date: formatDate(today),
     time: "11:00",
-    status: "confirmed",
+    status: "CONFIRMED",
     notes: "Cliente VIP",
     createdAt: formatDate(new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000)),
   },
@@ -197,7 +197,7 @@ export const appointments: Appointment[] = [
     servicePrice: 35,
     date: formatDate(today),
     time: "14:00",
-    status: "pending",
+    status: "PENDING",
     createdAt: formatDate(today),
   },
   {
@@ -212,7 +212,7 @@ export const appointments: Appointment[] = [
     servicePrice: 80,
     date: formatDate(new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000)),
     time: "09:30",
-    status: "confirmed",
+    status: "CONFIRMED",
     createdAt: formatDate(today),
   },
 ]

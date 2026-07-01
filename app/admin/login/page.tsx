@@ -159,9 +159,9 @@ export default function LoginPage() {
           <div className="mt-6 p-4 rounded-lg bg-muted text-sm">
             <p className="font-medium mb-2">Credenciais de teste:</p>
             <p className="text-muted-foreground">
-              Admin: admin@barberpro.com / admin123
+              Admin: admin@barberpro.com / admin1234
               <br />
-              Barbeiro: joao@barberpro.com / barber123
+              Barbeiro: joao@barberpro.com / barber1234
             </p>
           </div>
         </CardContent>
