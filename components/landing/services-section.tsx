@@ -5,15 +5,17 @@ import { Button } from "@/components/ui/button"
 import { Clock, ChevronRight } from "@/components/icons"
 import { services } from "@/lib/mock-data"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 export function ServicesSection() {
+  const t = useTranslations("landing.services")
   return (
     <section id="servicos" className="py-20 bg-secondary/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Nossos Serviços</h2>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">{t("title")}</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Oferecemos uma variedade de serviços premium para que você saia sempre no estilo.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -37,7 +39,7 @@ export function ServicesSection() {
                     </div>
                     <Button asChild variant="ghost" size="sm" className="group-hover:text-primary">
                       <Link href={`/agendar?service=${service.id}`}>
-                        Agendar
+                        {t("book")}
                         <ChevronRight className="w-4 h-4 ml-1" />
                       </Link>
                     </Button>

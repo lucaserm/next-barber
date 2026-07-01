@@ -2,18 +2,21 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Scissors, Menu, Calendar } from "@/components/icons"
-
-const navItems = [
-  { label: "Serviços", href: "#servicos" },
-  { label: "Profissionais", href: "#profissionais" },
-  { label: "Contato", href: "#contato" },
-]
+import { LanguageSwitcher } from "@/components/language-switcher"
 
 export function Header() {
+  const t = useTranslations("landing.nav")
   const [open, setOpen] = useState(false)
+
+  const navItems = [
+    { label: t("services"), href: "#servicos" },
+    { label: t("professionals"), href: "#profissionais" },
+    { label: t("contact"), href: "#contato" },
+  ]
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
@@ -40,13 +43,14 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
+            <LanguageSwitcher />
             <Button asChild variant="ghost" size="sm" className="hidden sm:flex">
-              <Link href="/admin/login">Área Admin</Link>
+              <Link href="/admin/login">{t("admin")}</Link>
             </Button>
             <Button asChild size="sm">
               <Link href="/agendar">
                 <Calendar className="w-4 h-4 mr-2" />
-                Agendar
+                {t("book")}
               </Link>
             </Button>
 
@@ -75,7 +79,7 @@ export function Header() {
                     onClick={() => setOpen(false)}
                     className="text-lg font-medium py-2 hover:text-primary transition-colors"
                   >
-                    Área Admin
+                    {t("admin")}
                   </Link>
                 </nav>
               </SheetContent>

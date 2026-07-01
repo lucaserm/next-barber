@@ -2,15 +2,17 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Phone, Mail, MapPin, Clock } from "@/components/icons"
+import { useTranslations } from "next-intl"
 
 export function ContactSection() {
+  const t = useTranslations("landing.contact")
   return (
     <section id="contato" className="py-20 bg-secondary/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Localização e Contato</h2>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">{t("title")}</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Venha nos visitar ou entre em contato para mais informações.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -22,11 +24,9 @@ export function ContactSection() {
                   <MapPin className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">Endereço</h3>
-                  <p className="text-muted-foreground">
-                    Rua dos Barbeiros, 123
-                    <br />
-                    Centro - São Paulo, SP
+                  <h3 className="font-semibold mb-1">{t("addressTitle")}</h3>
+                  <p className="text-muted-foreground whitespace-pre-line">
+                    {t("address")}
                   </p>
                 </div>
               </div>
@@ -36,7 +36,7 @@ export function ContactSection() {
                   <Phone className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">Telefone</h3>
+                  <h3 className="font-semibold mb-1">{t("phoneTitle")}</h3>
                   <p className="text-muted-foreground">(11) 99999-9999</p>
                 </div>
               </div>
@@ -46,7 +46,7 @@ export function ContactSection() {
                   <Mail className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">E-mail</h3>
+                  <h3 className="font-semibold mb-1">{t("emailTitle")}</h3>
                   <p className="text-muted-foreground">contato@barberpro.com</p>
                 </div>
               </div>
@@ -56,11 +56,9 @@ export function ContactSection() {
                   <Clock className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">Horário de Funcionamento</h3>
-                  <p className="text-muted-foreground">
-                    Seg - Sex: 09:00 - 20:00
-                    <br />
-                    Sábado: 09:00 - 18:00
+                  <h3 className="font-semibold mb-1">{t("hoursTitle")}</h3>
+                  <p className="text-muted-foreground whitespace-pre-line">
+                    {t("hours")}
                   </p>
                 </div>
               </div>

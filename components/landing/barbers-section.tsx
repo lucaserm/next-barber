@@ -4,15 +4,17 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { barbers } from "@/lib/mock-data"
+import { useTranslations } from "next-intl"
 
 export function BarbersSection() {
+  const t = useTranslations("landing.barbers")
   return (
     <section id="profissionais" className="py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Nossos Profissionais</h2>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">{t("title")}</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Equipe qualificada e experiente para oferecer o melhor atendimento.
+            {t("subtitle")}
           </p>
         </div>
 

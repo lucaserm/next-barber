@@ -1,0 +1,112 @@
+{
+  "metadata": {
+    "title": "Elite67 - Sistema de Gestão para Barbearias",
+    "description": "Sistema completo de gestão para barbearias. Agendamento online, controle financeiro, gestão de clientes e muito mais."
+  },
+  "landing": {
+    "nav": {
+      "services": "Serviços",
+      "professionals": "Profissionais",
+      "contact": "Contato",
+      "admin": "Área Admin",
+      "book": "Agendar"
+    },
+    "hero": {
+      "badge": "Barbearia Premium",
+      "title": "Estilo e <highlight>Precisão</highlight><br></br>em Cada Corte",
+      "subtitle": "Experiência premium em barbearia com profissionais qualificados. Agende seu horário online e transforme seu visual.",
+      "bookCta": "Agendar Horário",
+      "servicesCta": "Ver Serviços",
+      "statsExperience": "Anos de Experiência",
+      "statsClients": "Clientes Satisfeitos",
+      "statsRating": "Avaliação Média"
+    },
+    "services": {
+      "title": "Nossos Serviços",
+      "subtitle": "Oferecemos uma variedade de serviços premium para que você saia sempre no estilo.",
+      "book": "Agendar"
+    },
+    "barbers": {
+      "title": "Nossos Profissionais",
+      "subtitle": "Equipe qualificada e experiente para oferecer o melhor atendimento."
+    },
+    "contact": {
+      "title": "Localização e Contato",
+      "subtitle": "Venha nos visitar ou entre em contato para mais informações.",
+      "addressTitle": "Endereço",
+      "address": "Rua dos Barbeiros, 123\nCentro - São Paulo, SP",
+      "phoneTitle": "Telefone",
+      "emailTitle": "E-mail",
+      "hoursTitle": "Horário de Funcionamento",
+      "hours": "Seg - Sex: 09:00 - 20:00\nSábado: 09:00 - 18:00"
+    },
+    "footer": {
+      "rights": "Todos os direitos reservados.",
+      "terms": "Termos",
+      "privacy": "Privacidade"
+    }
+  },
+  "booking": {
+    "stepCounter": "Passo {step} de 4",
+    "steps": {
+      "service": "Serviço",
+      "professional": "Profissional",
+      "dateTime": "Data/Hora",
+      "data": "Dados"
+    },
+    "step1": {
+      "title": "Escolha o Serviço",
+      "subtitle": "Selecione o serviço desejado"
+    },
+    "step2": {
+      "title": "Escolha o Profissional",
+      "subtitle": "Selecione quem vai atender você"
+    },
+    "step3": {
+      "title": "Escolha Data e Horário",
+      "subtitle": "Selecione quando deseja ser atendido",
+      "dateLabel": "Data",
+      "timeLabel": "Horário",
+      "availableFor": "Horários disponíveis para {date}",
+      "selectDateFirst": "Selecione uma data primeiro",
+      "noSlots": "Não há horários disponíveis para esta data.",
+      "selectDateToSeeSlots": "Selecione uma data para ver os horários."
+    },
+    "step4": {
+      "title": "Seus Dados",
+      "subtitle": "Preencha seus dados para finalizar",
+      "nameLabel": "Nome completo *",
+      "namePlaceholder": "Seu nome",
+      "phoneLabel": "WhatsApp *",
+      "phonePlaceholder": "(11) 99999-9999",
+      "emailLabel": "E-mail (opcional)",
+      "emailPlaceholder": "seu@email.com",
+      "summaryTitle": "Resumo do Agendamento",
+      "service": "Serviço:",
+      "professional": "Profissional:",
+      "date": "Data:",
+      "time": "Horário:",
+      "total": "Total:"
+    },
+    "confirmed": {
+      "title": "Agendamento Confirmado!",
+      "subtitle": "Você receberá uma confirmação por WhatsApp em breve.",
+      "service": "Serviço:",
+      "professional": "Profissional:",
+      "date": "Data:",
+      "time": "Horário:",
+      "value": "Valor:",
+      "backHome": "Voltar ao Início"
+    },
+    "nav": {
+      "back": "Voltar",
+      "continue": "Continuar",
+      "booking": "Agendando...",
+      "confirm": "Confirmar Agendamento"
+    },
+    "loading": "Carregando dados...",
+    "loadingPage": "Carregando...",
+    "toastSuccess": "Agendamento realizado com sucesso!",
+    "toastError": "Erro ao criar agendamento: {message}"
+  }
+}

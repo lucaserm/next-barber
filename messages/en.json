@@ -1,0 +1,112 @@
+{
+  "metadata": {
+    "title": "Elite67 - Management System for Barbershops",
+    "description": "Complete management system for barbershops. Online scheduling, financial control, client management and much more."
+  },
+  "landing": {
+    "nav": {
+      "services": "Services",
+      "professionals": "Professionals",
+      "contact": "Contact",
+      "admin": "Admin Area",
+      "book": "Book Now"
+    },
+    "hero": {
+      "badge": "Premium Barbershop",
+      "title": "Style and <highlight>Precision</highlight><br></br>in Every Cut",
+      "subtitle": "A premium barbershop experience with skilled professionals. Book your appointment online and transform your look.",
+      "bookCta": "Book Appointment",
+      "servicesCta": "View Services",
+      "statsExperience": "Years of Experience",
+      "statsClients": "Happy Clients",
+      "statsRating": "Average Rating"
+    },
+    "services": {
+      "title": "Our Services",
+      "subtitle": "We offer a variety of premium services so you always leave in style.",
+      "book": "Book"
+    },
+    "barbers": {
+      "title": "Our Professionals",
+      "subtitle": "A skilled and experienced team to give you the best service."
+    },
+    "contact": {
+      "title": "Location and Contact",
+      "subtitle": "Come visit us or get in touch for more information.",
+      "addressTitle": "Address",
+      "address": "123 Barbers Street\nDowntown - São Paulo, SP",
+      "phoneTitle": "Phone",
+      "emailTitle": "Email",
+      "hoursTitle": "Opening Hours",
+      "hours": "Mon - Fri: 09:00 - 20:00\nSaturday: 09:00 - 18:00"
+    },
+    "footer": {
+      "rights": "All rights reserved.",
+      "terms": "Terms",
+      "privacy": "Privacy"
+    }
+  },
+  "booking": {
+    "stepCounter": "Step {step} of 4",
+    "steps": {
+      "service": "Service",
+      "professional": "Professional",
+      "dateTime": "Date/Time",
+      "data": "Details"
+    },
+    "step1": {
+      "title": "Choose the Service",
+      "subtitle": "Select the service you want"
+    },
+    "step2": {
+      "title": "Choose the Professional",
+      "subtitle": "Select who will serve you"
+    },
+    "step3": {
+      "title": "Choose Date and Time",
+      "subtitle": "Select when you'd like to be served",
+      "dateLabel": "Date",
+      "timeLabel": "Time",
+      "availableFor": "Available times for {date}",
+      "selectDateFirst": "Select a date first",
+      "noSlots": "There are no available times for this date.",
+      "selectDateToSeeSlots": "Select a date to see the available times."
+    },
+    "step4": {
+      "title": "Your Details",
+      "subtitle": "Fill in your details to finish",
+      "nameLabel": "Full name *",
+      "namePlaceholder": "Your name",
+      "phoneLabel": "WhatsApp *",
+      "phonePlaceholder": "(11) 99999-9999",
+      "emailLabel": "Email (optional)",
+      "emailPlaceholder": "you@email.com",
+      "summaryTitle": "Booking Summary",
+      "service": "Service:",
+      "professional": "Professional:",
+      "date": "Date:",
+      "time": "Time:",
+      "total": "Total:"
+    },
+    "confirmed": {
+      "title": "Booking Confirmed!",
+      "subtitle": "You'll receive a confirmation via WhatsApp shortly.",
+      "service": "Service:",
+      "professional": "Professional:",
+      "date": "Date:",
+      "time": "Time:",
+      "value": "Price:",
+      "backHome": "Back to Home"
+    },
+    "nav": {
+      "back": "Back",
+      "continue": "Continue",
+      "booking": "Booking...",
+      "confirm": "Confirm Booking"
+    },
+    "loading": "Loading data...",
+    "loadingPage": "Loading...",
+    "toastSuccess": "Booking completed successfully!",
+    "toastError": "Error creating booking: {message}"
+  }
+}

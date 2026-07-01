@@ -32,9 +32,14 @@ import {
 } from "@/lib/hooks/use-api";
 import { availableTimeSlots } from "@/lib/mock-data";
 import { toast } from "sonner";
-import { ptBR } from "date-fns/locale";
+import { enUS, ptBR } from "date-fns/locale";
+import { useLocale, useTranslations } from "next-intl";
 
 function BookingContent() {
+  const t = useTranslations("booking");
+  const locale = useLocale();
+  const intlLocale = locale === "pt-br" ? "pt-BR" : "en-US";
+  const dateFnsLocale = locale === "pt-br" ? ptBR : enUS;
   const searchParams = useSearchParams();
   const preSelectedService = searchParams.get("service");
 
@@ -122,10 +127,10 @@ function BookingContent() {
       {
         onSuccess: () => {
           setIsComplete(true);
-          toast.success("Agendamento realizado com sucesso!");
+          toast.success(t("toastSuccess"));
         },
         onError: (error) => {
-          toast.error(`Erro ao criar agendamento: ${error.message}`);
+          toast.error(t("toastError", { message: error.message }));
         },
       },
     );
@@ -139,32 +144,32 @@ function BookingContent() {
             <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <Check className="w-8 h-8 text-primary" />
             </div>
-            <CardTitle className="text-2xl">Agendamento Confirmado!</CardTitle>
+            <CardTitle className="text-2xl">{t("confirmed.title")}</CardTitle>
             <CardDescription>
-              Você receberá uma confirmação por WhatsApp em breve.
+              {t("confirmed.subtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="bg-secondary/50 rounded-lg p-4 text-left space-y-2">
               <p>
-                <strong>Serviço:</strong> {selectedServiceData?.name}
+                <strong>{t("confirmed.service")}</strong> {selectedServiceData?.name}
               </p>
               <p>
-                <strong>Profissional:</strong> {selectedBarberData?.name}
+                <strong>{t("confirmed.professional")}</strong> {selectedBarberData?.name}
               </p>
               <p>
-                <strong>Data:</strong>{" "}
-                {selectedDate?.toLocaleDateString("pt-BR")}
+                <strong>{t("confirmed.date")}</strong>{" "}
+                {selectedDate?.toLocaleDateString(intlLocale)}
               </p>
               <p>
-                <strong>Horário:</strong> {selectedTime}
+                <strong>{t("confirmed.time")}</strong> {selectedTime}
               </p>
               <p>
-                <strong>Valor:</strong> R$ {selectedServiceData?.price}
+                <strong>{t("confirmed.value")}</strong> R$ {selectedServiceData?.price}
               </p>
             </div>
             <Button asChild className="w-full">
-              <Link href="/">Voltar ao Início</Link>
+              <Link href="/">{t("confirmed.backHome")}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -178,7 +183,7 @@ function BookingContent() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Carregando dados...</p>
+          <p>{t("loading")}</p>
         </div>
       </div>
     );
@@ -195,7 +200,7 @@ function BookingContent() {
               <span className="font-serif text-xl font-bold">Elite67</span>
             </Link>
             <div className="text-sm text-muted-foreground">
-              Passo {step} de 4
+              {t("stepCounter", { step })}
             </div>
           </div>
         </div>
@@ -205,8 +210,12 @@ function BookingContent() {
       <div className="border-b">
         <div className="container mx-auto px-4">
           <div className="flex">
-            {["Serviço", "Profissional", "Data/Hora", "Dados"].map(
-              (label, index) => (
+            {[
+              t("steps.service"),
+              t("steps.professional"),
+              t("steps.dateTime"),
+              t("steps.data"),
+            ].map((label, index) => (
                 <div
                   key={label}
                   className={`flex-1 py-3 text-center text-sm font-medium border-b-2 transition-colors ${
@@ -232,9 +241,9 @@ function BookingContent() {
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-bold mb-2">Escolha o Serviço</h1>
+                <h1 className="text-2xl font-bold mb-2">{t("step1.title")}</h1>
                 <p className="text-muted-foreground">
-                  Selecione o serviço desejado
+                  {t("step1.subtitle")}
                 </p>
               </div>
 
@@ -281,10 +290,10 @@ function BookingContent() {
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-bold mb-2">
-                  Escolha o Profissional
+                  {t("step2.title")}
                 </h1>
                 <p className="text-muted-foreground">
-                  Selecione quem vai atender você
+                  {t("step2.subtitle")}
                 </p>
               </div>
 
@@ -345,17 +354,17 @@ function BookingContent() {
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-bold mb-2">
-                  Escolha Data e Horário
+                  {t("step3.title")}
                 </h1>
                 <p className="text-muted-foreground">
-                  Selecione quando deseja ser atendido
+                  {t("step3.subtitle")}
                 </p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Data</CardTitle>
+                    <CardTitle className="text-base">{t("step3.dateLabel")}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <Calendar
@@ -370,7 +379,7 @@ function BookingContent() {
                         today.setHours(0, 0, 0, 0);
                         return date < today || date.getDay() === 0;
                       }}
-                      locale={ptBR}
+                      locale={dateFnsLocale}
                       className="rounded-md"
                     />
                   </CardContent>
@@ -378,11 +387,13 @@ function BookingContent() {
 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Horário</CardTitle>
+                    <CardTitle className="text-base">{t("step3.timeLabel")}</CardTitle>
                     <CardDescription>
                       {selectedDate
-                        ? `Horários disponíveis para ${selectedDate.toLocaleDateString("pt-BR")}`
-                        : "Selecione uma data primeiro"}
+                        ? t("step3.availableFor", {
+                            date: selectedDate.toLocaleDateString(intlLocale),
+                          })
+                        : t("step3.selectDateFirst")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -405,12 +416,12 @@ function BookingContent() {
                         </div>
                       ) : (
                         <p className="text-muted-foreground text-sm">
-                          Não há horários disponíveis para esta data.
+                          {t("step3.noSlots")}
                         </p>
                       )
                     ) : (
                       <p className="text-muted-foreground text-sm">
-                        Selecione uma data para ver os horários.
+                        {t("step3.selectDateToSeeSlots")}
                       </p>
                     )}
                   </CardContent>
@@ -423,19 +434,19 @@ function BookingContent() {
           {step === 4 && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-bold mb-2">Seus Dados</h1>
+                <h1 className="text-2xl font-bold mb-2">{t("step4.title")}</h1>
                 <p className="text-muted-foreground">
-                  Preencha seus dados para finalizar
+                  {t("step4.subtitle")}
                 </p>
               </div>
 
               <Card>
                 <CardContent className="pt-6 space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Nome completo *</Label>
+                    <Label htmlFor="name">{t("step4.nameLabel")}</Label>
                     <Input
                       id="name"
-                      placeholder="Seu nome"
+                      placeholder={t("step4.namePlaceholder")}
                       value={clientData.name}
                       onChange={(e) =>
                         setClientData((prev) => ({
@@ -447,10 +458,10 @@ function BookingContent() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">WhatsApp *</Label>
+                    <Label htmlFor="phone">{t("step4.phoneLabel")}</Label>
                     <Input
                       id="phone"
-                      placeholder="(11) 99999-9999"
+                      placeholder={t("step4.phonePlaceholder")}
                       value={clientData.phone}
                       onChange={(e) =>
                         setClientData((prev) => ({
@@ -462,11 +473,11 @@ function BookingContent() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">E-mail (opcional)</Label>
+                    <Label htmlFor="email">{t("step4.emailLabel")}</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="seu@email.com"
+                      placeholder={t("step4.emailPlaceholder")}
                       value={clientData.email}
                       onChange={(e) =>
                         setClientData((prev) => ({
@@ -483,29 +494,29 @@ function BookingContent() {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base">
-                    Resumo do Agendamento
+                    {t("step4.summaryTitle")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Serviço:</span>
+                    <span className="text-muted-foreground">{t("step4.service")}</span>
                     <span>{selectedServiceData?.name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Profissional:</span>
+                    <span className="text-muted-foreground">{t("step4.professional")}</span>
                     <span>{selectedBarberData?.name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Data:</span>
-                    <span>{selectedDate?.toLocaleDateString("pt-BR")}</span>
+                    <span className="text-muted-foreground">{t("step4.date")}</span>
+                    <span>{selectedDate?.toLocaleDateString(intlLocale)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Horário:</span>
+                    <span className="text-muted-foreground">{t("step4.time")}</span>
                     <span>{selectedTime}</span>
                   </div>
                   <hr className="my-2" />
                   <div className="flex justify-between font-bold text-base">
-                    <span>Total:</span>
+                    <span>{t("step4.total")}</span>
                     <span className="text-primary">
                       R$ {selectedServiceData?.price}
                     </span>
@@ -523,7 +534,7 @@ function BookingContent() {
               disabled={step === 1}
             >
               <ChevronLeft className="w-4 h-4 mr-2" />
-              Voltar
+              {t("nav.back")}
             </Button>
 
             {step < 4 ? (
@@ -531,7 +542,7 @@ function BookingContent() {
                 onClick={() => setStep((s) => s + 1)}
                 disabled={!canProceed()}
               >
-                Continuar
+                {t("nav.continue")}
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
@@ -540,8 +551,8 @@ function BookingContent() {
                 disabled={!canProceed() || createAppointment.isPending}
               >
                 {createAppointment.isPending
-                  ? "Agendando..."
-                  : "Confirmar Agendamento"}
+                  ? t("nav.booking")
+                  : t("nav.confirm")}
               </Button>
             )}
           </div>
@@ -552,11 +563,12 @@ function BookingContent() {
 }
 
 export default function BookingPage() {
+  const t = useTranslations("booking");
   return (
     <Suspense
       fallback={
         <div className="min-h-screen bg-background flex items-center justify-center">
-          Carregando...
+          {t("loadingPage")}
         </div>
       }
     >
